@@ -88,11 +88,12 @@ the line ending and final newline, and strict UTF-8 decoding.
 Releases are published to the VS Code Marketplace by `.github/workflows/release.yml` using Trusted Publishing
 (no tokens). To release:
 
-1. Move the "Unreleased" notes in `CHANGELOG.md` under a new version heading and commit.
-2. `npm version patch` (or `minor` / `major`). This bumps `package.json` and creates the `vX.Y.Z` tag.
-3. `git push --follow-tags`
+1. Move the "Unreleased" notes in `CHANGELOG.md` under a new version heading.
+2. Bump the version: `npm version patch --no-git-tag-version` (or `minor` / `major`), commit and push to `main`.
+3. On GitHub: **Actions → Release → Run workflow** (branch `main`).
 
-The workflow runs the checks, publishes, and attaches the `.vsix` to a GitHub release.
+The workflow runs the checks, publishes, creates the `vX.Y.Z` tag and a GitHub release with the `.vsix`.
+Pushing a matching `vX.Y.Z` tag yourself (`npm version patch && git push --follow-tags`) works too.
 
 ## Pull requests
 

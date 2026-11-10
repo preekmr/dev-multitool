@@ -1,8 +1,9 @@
 name: Release
 
-# Publishes to the VS Code Marketplace when a version tag is pushed:
-#   npm version patch   # bumps package.json and creates tag vX.Y.Z
-#   git push --follow-tags
+# Publishes to the VS Code Marketplace. Two ways to start it:
+#   1. Actions tab → Release → "Run workflow" on main. Releases the version in package.json
+#      and creates the vX.Y.Z tag. Refuses to run if that tag already exists.
+#   2. Push a version tag:  npm version patch && git push --follow-tags
 #
 # Authentication uses Marketplace Trusted Publishing (OIDC): no token or secret is stored.
 # The publisher must have a Trusted Publishing policy for repo preekmr/dev-multitool
@@ -11,6 +12,7 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: write # create the GitHub release
@@ -30,21 +32,40 @@ jobs:
       - run: npm run check:manifest
       - run: npm test
 
-      - name: Check tag matches package.json version
+      - name: Determine release tag
+        id: version
         run: |
-          version="v$(node -p "require('./package.json').version")"
-          if [ "$version" != "$GITHUB_REF_NAME" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
-            exit 1
+          tag="v$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+            if [ "$tag" != "$GITHUB_REF_NAME" ]; then
+              echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $tag"
+              exit 1
+            fi
+          else
+            if [ "$GITHUB_REF_NAME" != "main" ]; then
+              echo "::error::Run the release from the main branch."
+              exit 1
+            fi
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null; then
+              echo "::error::$tag is already released. Bump the version in package.json first (npm version patch --no-git-tag-version)."
+              exit 1
+            fi
           fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
 
       - name: Package
-        run: npx vsce package --out "dev-multitool-${GITHUB_REF_NAME}.vsix"
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: npx vsce package --out "dev-multitool-${TAG}.vsix"
 
       - name: Publish to VS Code Marketplace
-        run: npx vsce publish --packagePath "dev-multitool-${GITHUB_REF_NAME}.vsix" --oidc
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: npx vsce publish --packagePath "dev-multitool-${TAG}.vsix" --oidc
 
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" "dev-multitool-${GITHUB_REF_NAME}.vsix" --generate-notes
+          TAG: ${{ steps.version.outputs.tag }}
+        # Creates the tag on this commit when started from the Run workflow button.
+        run: gh release create "$TAG" "dev-multitool-${TAG}.vsix" --target "$GITHUB_SHA" --generate-notes
