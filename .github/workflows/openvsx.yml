@@ -53,7 +53,26 @@ jobs:
             echo "::error::Add the OVSX_PAT repository secret (an open-vsx.org access token)."
             exit 1
           fi
+          # Ignore stray whitespace/newlines pasted along with the token.
+          OVSX_PAT="$(printf '%s' "$OVSX_PAT" | tr -d '[:space:]')"
+          export OVSX_PAT
           namespace=$(node -p "require('./package.json').publisher")
-          # First run only: create the namespace. Fails harmlessly when it already exists.
-          npx --yes ovsx@1.4.0 create-namespace "$namespace" || echo "Namespace $namespace already exists."
+          hint="Check the OVSX_PAT secret: create a new token at https://open-vsx.org/user-settings/tokens while logged in as the namespace owner, after signing the Publisher Agreement."
+
+          # First run only: create the namespace. "Already exists" is fine; anything else is a real error.
+          if ! out=$(npx --yes ovsx@1.4.0 create-namespace "$namespace" 2>&1); then
+            echo "$out"
+            if ! grep -qi "already exists" <<<"$out"; then
+              echo "::error::Could not create Open VSX namespace '$namespace'. $hint"
+              exit 1
+            fi
+          else
+            echo "$out"
+          fi
+
+          if ! npx --yes ovsx@1.4.0 verify-pat "$namespace"; then
+            echo "::error::The token cannot publish to namespace '$namespace'. $hint"
+            exit 1
+          fi
+
           npx --yes ovsx@1.4.0 publish --packagePath release/*.vsix --skip-duplicate
