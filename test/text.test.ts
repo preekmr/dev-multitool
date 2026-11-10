@@ -17,6 +17,11 @@ describe('Case', () => {
     expect(await run('case.title', 'user_first_name')).toBe('User First Name');
   });
 
+  it('converts to upper and lower case, including non-ASCII', async () => {
+    expect(await run('case.upper', 'hello Wörld_1')).toBe('HELLO WÖRLD_1');
+    expect(await run('case.lower', 'HELLO WÖRLD_1')).toBe('hello wörld_1');
+  });
+
   it('converts each line separately and keeps indentation', async () => {
     expect(await run('case.snake', '  fooBar\nbazQux\n')).toBe('  foo_bar\nbaz_qux\n');
   });
@@ -25,6 +30,10 @@ describe('Case', () => {
 describe('Lines', () => {
   it('sorts naturally and preserves CRLF and the final newline', async () => {
     expect(await run('lines.sort', 'file10\r\nfile2\r\nFile1\r\n', { eol: '\r\n' })).toBe('File1\r\nfile2\r\nfile10\r\n');
+  });
+
+  it('sorts descending, naturally', async () => {
+    expect(await run('lines.sortDesc', 'file2\nfile10\nfile1\n')).toBe('file10\nfile2\nfile1\n');
   });
 
   it('dedupes, reverses, removes blanks and trims', async () => {
@@ -46,6 +55,19 @@ describe('Time & Generate', () => {
     expect(await run('time.unixToIso', '1700000000000000')).toBe('2023-11-14T22:13:20.000Z');
     expect(await run('time.isoToUnix', '2023-11-14T22:13:20Z')).toBe('1700000000');
     await expect(run('time.isoToUnix', 'not a date')).rejects.toThrow(/parse/);
+  });
+
+  it('inserts the current time as ISO 8601 and Unix seconds', async () => {
+    const before = Date.now();
+    const iso = await run('time.insertIso', '');
+    const unix = Number(await run('time.insertUnix', ''));
+    const after = Date.now();
+    expect(iso).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    expect(Date.parse(iso)).toBeGreaterThanOrEqual(before);
+    expect(Date.parse(iso)).toBeLessThanOrEqual(after);
+    expect(Number.isInteger(unix)).toBe(true);
+    expect(unix).toBeGreaterThanOrEqual(Math.floor(before / 1000));
+    expect(unix).toBeLessThanOrEqual(Math.floor(after / 1000));
   });
 
   it('generates UUIDs', async () => {

@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { tools } from '../src/tools';
@@ -27,5 +27,15 @@ describe('registry', () => {
       expect(ids.has(`multitool.${tool.id}`)).toBe(true);
       expect(inMenus.has(`multitool.${tool.id}`)).toBe(true);
     }
+  });
+
+  it('every tool is exercised by at least one test', () => {
+    const testDir = __dirname;
+    const testSources = readdirSync(testDir)
+      .filter((f) => f.endsWith('.test.ts') && f !== 'registry.test.ts')
+      .map((f) => readFileSync(resolve(testDir, f), 'utf8'))
+      .join('\n');
+    const untested = tools.filter((t) => !testSources.includes(`'${t.id}'`)).map((t) => t.id);
+    expect(untested, 'Add a test that calls run(<id>, ...) for each of these tools').toEqual([]);
   });
 });

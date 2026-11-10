@@ -61,7 +61,8 @@ regenerates `package.json`. Then implement `run` and the test.
 
 2. Run `npm run sync`. This writes the command, its context-menu entry, any default keybinding, and the README
    table. CI fails if you forget (`npm run check:manifest`).
-3. Add tests in `test/`.
+3. Add tests in `test/` that call `run('<tool id>', input)`. A registry test fails if any tool has no test,
+   so every tool stays covered. (`npm run new-tool` creates the test file for you.)
 
 ### Tool options
 

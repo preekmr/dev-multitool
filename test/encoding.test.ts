@@ -61,6 +61,15 @@ describe('Hex', () => {
 describe('Hash', () => {
   it('computes digests', async () => {
     expect(await run('hash.md5', 'hello')).toBe('5d41402abc4b2a76b9719d911017c592');
+    expect(await run('hash.sha1', 'hello')).toBe('aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d');
     expect(await run('hash.sha256', 'hello')).toBe('2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824');
+    expect(await run('hash.sha512', 'hello')).toBe(
+      '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043',
+    );
+  });
+
+  it('hashes UTF-8 bytes, not UTF-16 code units', async () => {
+    // Independent reference: printf 'é' | md5sum  (bytes c3 a9)
+    expect(await run('hash.md5', 'é')).toBe('66ddcd97cfdeabb2f6fb8a999b4bc76f');
   });
 });
