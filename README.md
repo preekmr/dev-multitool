@@ -1,5 +1,3 @@
-<img src="images/icon.png" width="96" alt="Dev Multitool icon">
-
 # Dev Multitool for VS Code
 
 Format, convert, encode and decode text without leaving the editor. Select some text (or nothing, to use the
@@ -19,7 +17,6 @@ whole file), open the Command Palette and type the tool name.
 
 - **VS Code:** [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool), or search for "Dev Multitool" in the Extensions view.
 - **VSCodium, Cursor, Windsurf, Gitpod and other editors using Open VSX:** [Open VSX](https://open-vsx.org/extension/preekmr/dev-multitool).
-- **Manual:** download the `.vsix` from [GitHub Releases](https://github.com/preekmr/dev-multitool/releases) and use *Extensions: Install from VSIX…*.
 
 ## Usage
 
@@ -123,8 +120,8 @@ verify signatures.
 
 ## Contributing
 
-New tools are a single function. See [CONTRIBUTING.md](CONTRIBUTING.md).
+New tools are a single function. See `CONTRIBUTING.md` in the source repository.
 
 ## License
 
-[MIT](LICENSE)
+MIT

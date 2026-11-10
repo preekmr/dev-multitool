@@ -2,6 +2,10 @@
 
 All notable changes to Dev Multitool are listed here.
 
+## 0.1.2 — 2026-11-10
+
+- README: fix the broken icon image and links on the Marketplace page.
+
 ## 0.1.1 — 2026-11-10
 
 - README: install links for the VS Code Marketplace, Open VSX and GitHub Releases.
