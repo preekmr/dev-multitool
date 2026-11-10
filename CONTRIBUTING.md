@@ -93,6 +93,8 @@ Releases are published to the VS Code Marketplace by `.github/workflows/release.
 3. On GitHub: **Actions → Release → Run workflow** (branch `main`).
 
 The workflow runs the checks, publishes, creates the `vX.Y.Z` tag and a GitHub release with the `.vsix`.
+When it succeeds, `.github/workflows/openvsx.yml` publishes the same `.vsix` to [Open VSX](https://open-vsx.org)
+(needs the `OVSX_PAT` repository secret). Run that workflow by hand to retry or to publish an older release.
 Pushing a matching `vX.Y.Z` tag yourself (`npm version patch && git push --follow-tags`) works too.
 
 ## Pull requests

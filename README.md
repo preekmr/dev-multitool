@@ -15,6 +15,12 @@ whole file), open the Command Palette and type the tool name.
 - **Lines** – sort (natural), remove duplicates, reverse, remove blanks, trim, count
 - **Time / Generate** – Unix ⇄ ISO 8601 conversion, insert timestamp, insert UUID
 
+## Install
+
+- **VS Code:** [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool), or search for "Dev Multitool" in the Extensions view.
+- **VSCodium, Cursor, Windsurf, Gitpod and other editors using Open VSX:** [Open VSX](https://open-vsx.org/extension/preekmr/dev-multitool).
+- **Manual:** download the `.vsix` from [GitHub Releases](https://github.com/preekmr/dev-multitool/releases) and use *Extensions: Install from VSIX…*.
+
 ## Usage
 
 | How | What |

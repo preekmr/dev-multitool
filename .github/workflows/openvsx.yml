@@ -1,0 +1,59 @@
+name: Publish to Open VSX
+
+# Publishes the .vsix attached to a GitHub release to open-vsx.org (used by VSCodium, Cursor,
+# Windsurf, Gitpod, Eclipse Theia and others).
+#
+# - Runs automatically after the Release workflow succeeds (publishes the latest release).
+# - Can be started by hand from the Actions tab for an older release or to retry.
+#
+# Needs the repository secret OVSX_PAT (an open-vsx.org access token). Once the extension exists on
+# Open VSX and the namespace is verified, this workflow can switch to Open VSX Trusted Publishing:
+# register this file (openvsx.yml) as a trusted publisher and drop the secret.
+
+on:
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish, e.g. v0.1.0 (empty = latest release)
+        required: false
+
+permissions:
+  contents: read
+  id-token: write # for Open VSX Trusted Publishing, once set up
+
+jobs:
+  publish:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      - name: Download the .vsix from the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [ -z "$TAG" ]; then
+            TAG=$(gh release view -R "$GITHUB_REPOSITORY" --json tagName --jq .tagName)
+          fi
+          echo "Publishing $TAG"
+          gh release download "$TAG" -R "$GITHUB_REPOSITORY" --pattern '*.vsix' --dir release
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "::error::Add the OVSX_PAT repository secret (an open-vsx.org access token)."
+            exit 1
+          fi
+          namespace=$(node -p "require('./package.json').publisher")
+          # First run only: create the namespace. Fails harmlessly when it already exists.
+          npx --yes ovsx@1.4.0 create-namespace "$namespace" || echo "Namespace $namespace already exists."
+          npx --yes ovsx@1.4.0 publish --packagePath release/*.vsix --skip-duplicate
