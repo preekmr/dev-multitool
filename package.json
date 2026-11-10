@@ -1,0 +1,873 @@
+{
+  "name": "dev-multitool",
+  "displayName": "Dev Multitool",
+  "description": "Format, convert, encode and decode text without leaving the editor: JSON, XML, YAML, Base64, URL, JWT, hashes, case conversion and more.",
+  "version": "0.1.0",
+  "publisher": "devkit",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/preekmr/dev-multitool.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Formatters",
+    "Other"
+  ],
+  "keywords": [
+    "json",
+    "xml",
+    "yaml",
+    "base64",
+    "jwt",
+    "url encode",
+    "hash",
+    "developer tools"
+  ],
+  "main": "./dist/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "commands": [
+      {
+        "command": "multitool.runTool",
+        "title": "Run Tool…",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.runToolToNewTab",
+        "title": "Run Tool (Result in New Tab)…",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.repeatLastTool",
+        "title": "Repeat Last Tool",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.format",
+        "title": "JSON Format",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.minify",
+        "title": "JSON Minify",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.sortKeys",
+        "title": "JSON Sort Keys",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.validate",
+        "title": "JSON Validate",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.stringify",
+        "title": "JSON Escape (Stringify)",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.unstringify",
+        "title": "JSON Unescape (Parse String)",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.toYaml",
+        "title": "JSON to YAML",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.xml.format",
+        "title": "XML Format",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.xml.minify",
+        "title": "XML Minify",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.xml.validate",
+        "title": "XML Validate",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.yaml.toJson",
+        "title": "YAML to JSON",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.base64.encode",
+        "title": "Base64 Encode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.base64.decode",
+        "title": "Base64 Decode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.base64.urlEncode",
+        "title": "Base64 URL-safe Encode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.base64.urlDecode",
+        "title": "Base64 URL-safe Decode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.url.encode",
+        "title": "URL Encode Component",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.url.decode",
+        "title": "URL Decode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.url.parse",
+        "title": "URL Parse to JSON",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.jwt.decode",
+        "title": "JWT Decode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.hash.md5",
+        "title": "Hash MD5",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.hash.sha1",
+        "title": "Hash SHA-1",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.hash.sha256",
+        "title": "Hash SHA-256",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.hash.sha512",
+        "title": "Hash SHA-512",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.html.encode",
+        "title": "HTML Escape Entities",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.html.decode",
+        "title": "HTML Unescape Entities",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.hex.encode",
+        "title": "Hex Encode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.hex.decode",
+        "title": "Hex Decode",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.camel",
+        "title": "Case to camelCase",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.pascal",
+        "title": "Case to PascalCase",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.snake",
+        "title": "Case to snake_case",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.constant",
+        "title": "Case to CONSTANT_CASE",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.kebab",
+        "title": "Case to kebab-case",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.title",
+        "title": "Case to Title Case",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.upper",
+        "title": "Case to UPPERCASE",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.case.lower",
+        "title": "Case to lowercase",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.lines.sort",
+        "title": "Lines Sort Ascending",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.lines.sortDesc",
+        "title": "Lines Sort Descending",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.lines.unique",
+        "title": "Lines Remove Duplicates",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.lines.reverse",
+        "title": "Lines Reverse Order",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.lines.removeBlank",
+        "title": "Lines Remove Blank Lines",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.lines.trim",
+        "title": "Lines Trim Whitespace",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.lines.count",
+        "title": "Lines Count Lines, Words, Characters",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.time.unixToIso",
+        "title": "Time Unix Timestamp to ISO 8601",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.time.isoToUnix",
+        "title": "Time Date to Unix Timestamp (seconds)",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.time.insertIso",
+        "title": "Time Insert Current ISO Timestamp",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.time.insertUnix",
+        "title": "Time Insert Current Unix Timestamp",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.generate.uuid",
+        "title": "Generate UUID v4",
+        "category": "Multitool"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "multitool.context",
+        "label": "Multitool"
+      },
+      {
+        "id": "multitool.context.json",
+        "label": "JSON"
+      },
+      {
+        "id": "multitool.context.xml",
+        "label": "XML"
+      },
+      {
+        "id": "multitool.context.yaml",
+        "label": "YAML"
+      },
+      {
+        "id": "multitool.context.base64",
+        "label": "Base64"
+      },
+      {
+        "id": "multitool.context.url",
+        "label": "URL"
+      },
+      {
+        "id": "multitool.context.jwt",
+        "label": "JWT"
+      },
+      {
+        "id": "multitool.context.hash",
+        "label": "Hash"
+      },
+      {
+        "id": "multitool.context.html",
+        "label": "HTML"
+      },
+      {
+        "id": "multitool.context.hex",
+        "label": "Hex"
+      },
+      {
+        "id": "multitool.context.case",
+        "label": "Case"
+      },
+      {
+        "id": "multitool.context.lines",
+        "label": "Lines"
+      },
+      {
+        "id": "multitool.context.time",
+        "label": "Time"
+      },
+      {
+        "id": "multitool.context.generate",
+        "label": "Generate"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "multitool.json.format",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.minify",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.sortKeys",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.validate",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.stringify",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.unstringify",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.toYaml",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.xml.format",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.xml.minify",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.xml.validate",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.yaml.toJson",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.base64.encode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.base64.decode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.base64.urlEncode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.base64.urlDecode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.url.encode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.url.decode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.url.parse",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.jwt.decode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.hash.md5",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.hash.sha1",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.hash.sha256",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.hash.sha512",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.html.encode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.html.decode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.hex.encode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.hex.decode",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.camel",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.pascal",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.snake",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.constant",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.kebab",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.title",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.upper",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.case.lower",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.lines.sort",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.lines.sortDesc",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.lines.unique",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.lines.reverse",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.lines.removeBlank",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.lines.trim",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.lines.count",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.time.unixToIso",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.time.isoToUnix",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.time.insertIso",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.time.insertUnix",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.generate.uuid",
+          "when": "editorIsOpen"
+        }
+      ],
+      "editor/context": [
+        {
+          "submenu": "multitool.context",
+          "group": "1_modification@99",
+          "when": "config.multitool.contextMenu.enabled"
+        }
+      ],
+      "multitool.context": [
+        {
+          "command": "multitool.runTool",
+          "group": "0_pick@1"
+        },
+        {
+          "command": "multitool.repeatLastTool",
+          "group": "0_pick@2"
+        },
+        {
+          "submenu": "multitool.context.json",
+          "group": "1_tools@1"
+        },
+        {
+          "submenu": "multitool.context.xml",
+          "group": "1_tools@2"
+        },
+        {
+          "submenu": "multitool.context.yaml",
+          "group": "1_tools@3"
+        },
+        {
+          "submenu": "multitool.context.base64",
+          "group": "1_tools@4"
+        },
+        {
+          "submenu": "multitool.context.url",
+          "group": "1_tools@5"
+        },
+        {
+          "submenu": "multitool.context.jwt",
+          "group": "1_tools@6"
+        },
+        {
+          "submenu": "multitool.context.hash",
+          "group": "1_tools@7"
+        },
+        {
+          "submenu": "multitool.context.html",
+          "group": "1_tools@8"
+        },
+        {
+          "submenu": "multitool.context.hex",
+          "group": "1_tools@9"
+        },
+        {
+          "submenu": "multitool.context.case",
+          "group": "1_tools@10"
+        },
+        {
+          "submenu": "multitool.context.lines",
+          "group": "1_tools@11"
+        },
+        {
+          "submenu": "multitool.context.time",
+          "group": "1_tools@12"
+        },
+        {
+          "submenu": "multitool.context.generate",
+          "group": "1_tools@13"
+        }
+      ],
+      "multitool.context.json": [
+        {
+          "command": "multitool.json.format",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.json.minify",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.json.sortKeys",
+          "group": "1_tools@3"
+        },
+        {
+          "command": "multitool.json.validate",
+          "group": "1_tools@4"
+        },
+        {
+          "command": "multitool.json.stringify",
+          "group": "1_tools@5"
+        },
+        {
+          "command": "multitool.json.unstringify",
+          "group": "1_tools@6"
+        },
+        {
+          "command": "multitool.json.toYaml",
+          "group": "1_tools@7"
+        }
+      ],
+      "multitool.context.xml": [
+        {
+          "command": "multitool.xml.format",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.xml.minify",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.xml.validate",
+          "group": "1_tools@3"
+        }
+      ],
+      "multitool.context.yaml": [
+        {
+          "command": "multitool.yaml.toJson",
+          "group": "1_tools@1"
+        }
+      ],
+      "multitool.context.base64": [
+        {
+          "command": "multitool.base64.encode",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.base64.decode",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.base64.urlEncode",
+          "group": "1_tools@3"
+        },
+        {
+          "command": "multitool.base64.urlDecode",
+          "group": "1_tools@4"
+        }
+      ],
+      "multitool.context.url": [
+        {
+          "command": "multitool.url.encode",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.url.decode",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.url.parse",
+          "group": "1_tools@3"
+        }
+      ],
+      "multitool.context.jwt": [
+        {
+          "command": "multitool.jwt.decode",
+          "group": "1_tools@1"
+        }
+      ],
+      "multitool.context.hash": [
+        {
+          "command": "multitool.hash.md5",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.hash.sha1",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.hash.sha256",
+          "group": "1_tools@3"
+        },
+        {
+          "command": "multitool.hash.sha512",
+          "group": "1_tools@4"
+        }
+      ],
+      "multitool.context.html": [
+        {
+          "command": "multitool.html.encode",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.html.decode",
+          "group": "1_tools@2"
+        }
+      ],
+      "multitool.context.hex": [
+        {
+          "command": "multitool.hex.encode",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.hex.decode",
+          "group": "1_tools@2"
+        }
+      ],
+      "multitool.context.case": [
+        {
+          "command": "multitool.case.camel",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.case.pascal",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.case.snake",
+          "group": "1_tools@3"
+        },
+        {
+          "command": "multitool.case.constant",
+          "group": "1_tools@4"
+        },
+        {
+          "command": "multitool.case.kebab",
+          "group": "1_tools@5"
+        },
+        {
+          "command": "multitool.case.title",
+          "group": "1_tools@6"
+        },
+        {
+          "command": "multitool.case.upper",
+          "group": "1_tools@7"
+        },
+        {
+          "command": "multitool.case.lower",
+          "group": "1_tools@8"
+        }
+      ],
+      "multitool.context.lines": [
+        {
+          "command": "multitool.lines.sort",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.lines.sortDesc",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.lines.unique",
+          "group": "1_tools@3"
+        },
+        {
+          "command": "multitool.lines.reverse",
+          "group": "1_tools@4"
+        },
+        {
+          "command": "multitool.lines.removeBlank",
+          "group": "1_tools@5"
+        },
+        {
+          "command": "multitool.lines.trim",
+          "group": "1_tools@6"
+        },
+        {
+          "command": "multitool.lines.count",
+          "group": "1_tools@7"
+        }
+      ],
+      "multitool.context.time": [
+        {
+          "command": "multitool.time.unixToIso",
+          "group": "1_tools@1"
+        },
+        {
+          "command": "multitool.time.isoToUnix",
+          "group": "1_tools@2"
+        },
+        {
+          "command": "multitool.time.insertIso",
+          "group": "1_tools@3"
+        },
+        {
+          "command": "multitool.time.insertUnix",
+          "group": "1_tools@4"
+        }
+      ],
+      "multitool.context.generate": [
+        {
+          "command": "multitool.generate.uuid",
+          "group": "1_tools@1"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "multitool.runTool",
+        "key": "ctrl+alt+shift+d",
+        "mac": "cmd+alt+shift+d",
+        "when": "editorTextFocus"
+      }
+    ],
+    "configuration": {
+      "title": "Dev Multitool",
+      "properties": {
+        "multitool.indent": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "default": "auto",
+          "markdownDescription": "Indentation for formatters: `\"auto\"` follows the editor (tab size / insert spaces), `\"tab\"` uses tabs, or a number of spaces."
+        },
+        "multitool.contextMenu.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the Multitool submenu in the editor right-click menu."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "sync": "tsx scripts/sync-manifest.ts",
+    "check:manifest": "tsx scripts/sync-manifest.ts --check",
+    "new-tool": "tsx scripts/new-tool.ts",
+    "vscode:prepublish": "npm run check:manifest && node esbuild.mjs --production",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^5.12.0",
+    "xml-formatter": "^3.7.0",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^4.1.0",
+    "esbuild": "^0.28.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  },
+  "bugs": {
+    "url": "https://github.com/preekmr/dev-multitool/issues"
+  },
+  "homepage": "https://github.com/preekmr/dev-multitool#readme"
+}
