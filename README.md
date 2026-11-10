@@ -1,3 +1,5 @@
+<img src="images/icon.png" width="96" alt="Dev Multitool icon">
+
 # Dev Multitool for VS Code
 
 Format, convert, encode and decode text without leaving the editor. Select some text (or nothing, to use the
