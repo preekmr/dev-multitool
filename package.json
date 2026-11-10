@@ -3,7 +3,7 @@
   "displayName": "Dev Multitool",
   "description": "Format, convert, encode and decode text without leaving the editor: JSON, XML, YAML, Base64, URL, JWT, hashes, case conversion and more.",
   "version": "0.1.0",
-  "publisher": "devkit",
+  "publisher": "preekmr",
   "license": "MIT",
   "repository": {
     "type": "git",

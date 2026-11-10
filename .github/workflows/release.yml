@@ -1,0 +1,50 @@
+name: Release
+
+# Publishes to the VS Code Marketplace when a version tag is pushed:
+#   npm version patch   # bumps package.json and creates tag vX.Y.Z
+#   git push --follow-tags
+#
+# Authentication uses Marketplace Trusted Publishing (OIDC): no token or secret is stored.
+# The publisher must have a Trusted Publishing policy for repo preekmr/dev-multitool
+# and workflow file release.yml.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write # create the GitHub release
+  id-token: write # OIDC token for Marketplace Trusted Publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run check:manifest
+      - run: npm test
+
+      - name: Check tag matches package.json version
+        run: |
+          version="v$(node -p "require('./package.json').version")"
+          if [ "$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+
+      - name: Package
+        run: npx vsce package --out "dev-multitool-${GITHUB_REF_NAME}.vsix"
+
+      - name: Publish to VS Code Marketplace
+        run: npx vsce publish --packagePath "dev-multitool-${GITHUB_REF_NAME}.vsix" --oidc
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" "dev-multitool-${GITHUB_REF_NAME}.vsix" --generate-notes

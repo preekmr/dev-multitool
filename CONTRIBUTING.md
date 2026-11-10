@@ -83,6 +83,17 @@ the line ending and final newline, and strict UTF-8 decoding.
 - Prefer Node built-ins. If you add a dependency, keep it small: it is bundled into the extension.
 - Errors should tell the user what was expected, not just that something failed.
 
+## Releasing (maintainers)
+
+Releases are published to the VS Code Marketplace by `.github/workflows/release.yml` using Trusted Publishing
+(no tokens). To release:
+
+1. Move the "Unreleased" notes in `CHANGELOG.md` under a new version heading and commit.
+2. `npm version patch` (or `minor` / `major`). This bumps `package.json` and creates the `vX.Y.Z` tag.
+3. `git push --follow-tags`
+
+The workflow runs the checks, publishes, and attaches the `.vsix` to a GitHub release.
+
 ## Pull requests
 
 - `npm run typecheck && npm test && npm run check:manifest` must pass.
