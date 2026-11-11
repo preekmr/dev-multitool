@@ -59,20 +59,20 @@ jobs:
           namespace=$(node -p "require('./package.json').publisher")
           hint="Check the OVSX_PAT secret: create a new token at https://open-vsx.org/user-settings/tokens while logged in as the namespace owner, after signing the Publisher Agreement."
 
-          # First run only: create the namespace. "Already exists" is fine; anything else is a real error.
-          if ! out=$(npx --yes ovsx@1.4.0 create-namespace "$namespace" 2>&1); then
-            echo "$out"
-            if ! grep -qi "already exists" <<<"$out"; then
-              echo "::error::Could not create Open VSX namespace '$namespace'. $hint"
+          # Create the namespace only if it does not exist yet. Tokens scoped to "publishing only"
+          # cannot create namespaces, so don't call create-namespace when it isn't needed.
+          status=$(curl -s -o /dev/null -w '%{http_code}' "https://open-vsx.org/api/$namespace")
+          if [ "$status" = "404" ]; then
+            echo "Creating Open VSX namespace $namespace"
+            if ! npx --yes ovsx@1.4.0 create-namespace "$namespace"; then
+              echo "::error::Could not create Open VSX namespace '$namespace'. Create it on open-vsx.org (Settings → Namespaces) or use a token that may create namespaces. $hint"
               exit 1
             fi
           else
-            echo "$out"
+            echo "Namespace $namespace exists (HTTP $status)."
           fi
 
-          if ! npx --yes ovsx@1.4.0 verify-pat "$namespace"; then
-            echo "::error::The token cannot publish to namespace '$namespace'. $hint"
+          if ! npx --yes ovsx@1.4.0 publish --packagePath release/*.vsix --skip-duplicate; then
+            echo "::error::Publishing to Open VSX failed. $hint"
             exit 1
           fi
-
-          npx --yes ovsx@1.4.0 publish --packagePath release/*.vsix --skip-duplicate
