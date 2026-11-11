@@ -41,6 +41,8 @@ class PostHogSender implements vscode.TelemetrySender {
     private readonly host: string,
     private readonly distinctId: string,
     private readonly extensionRoot: string,
+    /** Editor name, e.g. "Visual Studio Code", "Cursor", "VSCodium". */
+    private readonly editor: string,
   ) {
     this.timer = setInterval(() => void this.send(), FLUSH_INTERVAL_MS);
     // Don't keep the extension host alive just for telemetry.
@@ -72,7 +74,7 @@ class PostHogSender implements vscode.TelemetrySender {
       event,
       distinct_id: this.distinctId,
       // Anonymous events: PostHog creates no person profile and does no IP geolocation.
-      properties: { ...properties, $process_person_profile: false, $geoip_disable: true, $lib: 'dev-multitool' },
+      properties: { ...properties, editor: this.editor, $process_person_profile: false, $geoip_disable: true, $lib: 'dev-multitool' },
       timestamp: new Date().toISOString(),
     });
     if (this.queue.length >= FLUSH_AT) void this.send();
@@ -108,6 +110,7 @@ export function initTelemetry(context: vscode.ExtensionContext): void {
     POSTHOG_HOST,
     vscode.env.machineId, // anonymous, per-install id provided by VS Code
     context.extensionUri.fsPath,
+    vscode.env.appName,
   );
   // TelemetryLogger adds common properties (extension version, VS Code version, OS, app name)
   // and reports unhandled errors thrown from this extension's code.
