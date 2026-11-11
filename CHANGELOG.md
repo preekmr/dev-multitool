@@ -2,7 +2,7 @@
 
 All notable changes to Dev Multitool are listed here.
 
-## Unreleased
+## 0.2.0 — 2026-11-11
 
 - Anonymous usage and error telemetry (PostHog). Follows VS Code's `telemetry.telemetryLevel` setting;
   never sends your text, file names or paths. See "Telemetry" in the README.
