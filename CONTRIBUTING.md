@@ -21,10 +21,12 @@ src/
     runner.ts     # VS Code glue: selections, whole document, multi-cursor, output
     picker.ts     # the "Multitool: Run Tool…" quick pick
     util.ts       # shared helpers (JSON parsing with line/column, line handling, UTF-8)
+    telemetry-format.ts  # telemetry event shapes and privacy scrubbing (pure, tested)
   tools/
     index.ts      # the registry — every tool is listed here
     json.ts, base64.ts, jwt.ts, …   # one file per category
   extension.ts    # registers one command per tool + the picker commands
+  telemetry.ts    # anonymous PostHog telemetry via vscode.TelemetryLogger (off unless POSTHOG_KEY is set at build)
 scripts/
   sync-manifest.ts  # generates package.json "contributes" + README tool table
   new-tool.ts       # scaffolds a new tool
@@ -75,7 +77,8 @@ regenerates `package.json`. Then implement `run` and the test.
 | `run(input, ctx)` | Can be async. `ctx.indent` is the indentation to use, `ctx.eol` the document line ending. |
 
 For invalid input, `throw new ToolError('Helpful message')`. The runner shows it to the user and leaves the text
-untouched. Helpers in `src/core/util.ts` cover JSON parsing with line/column errors, line-based transforms that keep
+untouched. Always use `ToolError` for bad input: any other exception is reported to telemetry as a bug in the tool.
+Helpers in `src/core/util.ts` cover JSON parsing with line/column errors, line-based transforms that keep
 the line ending and final newline, and strict UTF-8 decoding.
 
 ### Guidelines

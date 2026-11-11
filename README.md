@@ -115,8 +115,27 @@ Or open **Preferences: Open Keyboard Shortcuts**, search for `Multitool` and cli
 
 ## Privacy
 
-Everything runs locally inside VS Code. No text is ever sent over the network. JWT decoding does **not**
+Everything runs locally inside VS Code. The text you work on is never sent anywhere. JWT decoding does **not**
 verify signatures.
+
+### Telemetry
+
+To find bugs and see which tools are used, Dev Multitool sends anonymous telemetry to
+[PostHog](https://posthog.com). It follows VS Code's **`telemetry.telemetryLevel`** setting: set it to `off`
+to send nothing, or to `error` to send only error reports.
+
+What is sent, per tool run:
+
+- the tool id (e.g. `json.format`), how it was started (command, picker, repeat last), the output mode,
+  the number of selections, whether it ran on the whole document, how long it took, and whether it
+  succeeded, failed on invalid input, or hit a bug (with the error type, e.g. `TypeError`);
+- the extension version, VS Code version, editor app name and operating system;
+- VS Code's anonymous machine id.
+
+For bugs, a stack trace is sent with file names outside the extension removed.
+
+Never sent: your text or selections, error messages (they can quote your text), file names, paths,
+workspace names or IP-based location.
 
 ## Contributing
 

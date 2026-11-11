@@ -7,7 +7,13 @@ export const urlTools = [
     category: 'URL',
     title: 'Encode Component',
     description: 'Percent-encode text for use in a query parameter or path segment',
-    run: (input) => encodeURIComponent(input),
+    run: (input) => {
+      try {
+        return encodeURIComponent(input);
+      } catch {
+        throw new ToolError('Input contains an invalid Unicode character (a lone surrogate) that cannot be URL-encoded.');
+      }
+    },
   }),
   defineTool({
     id: 'url.decode',

@@ -11,6 +11,13 @@ const ctx = await esbuild.context({
   target: 'node18',
   outfile: 'dist/extension.js',
   external: ['vscode'],
+  // Telemetry is only enabled in release builds that set POSTHOG_KEY (see release.yml).
+  define: {
+    __POSTHOG_KEY__: JSON.stringify(process.env.POSTHOG_KEY ?? ''),
+    __POSTHOG_HOST__: JSON.stringify(process.env.POSTHOG_HOST ?? ''),
+  },
+  // Keep function names so error stack traces stay readable in the minified bundle.
+  keepNames: true,
   sourcemap: !production,
   minify: production,
   logLevel: 'info',
