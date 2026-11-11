@@ -51,16 +51,24 @@ class PostHogSender implements vscode.TelemetrySender {
 
   sendEventData(eventName: string, data?: Record<string, unknown>): void {
     // TelemetryLogger prefixes names with the extension id ("preekmr.dev-multitool/tool.run").
-    const event = eventName.slice(eventName.lastIndexOf('/') + 1);
-    this.enqueue(event, cleanProperties(data ?? {}));
+    try {
+      const event = eventName.slice(eventName.lastIndexOf('/') + 1);
+      this.enqueue(event, cleanProperties(data ?? {}));
+    } catch {
+      // ignore
+    }
   }
 
   sendErrorData(error: Error, data?: Record<string, unknown>): void {
-    this.enqueue('$exception', {
-      ...cleanProperties(data ?? {}),
-      ...exceptionProperties(error, this.extensionRoot),
-    });
-    void this.send(); // errors go out right away
+    try {
+      this.enqueue('$exception', {
+        ...cleanProperties(data ?? {}),
+        ...exceptionProperties(error, this.extensionRoot),
+      });
+      void this.send(); // errors go out right away
+    } catch {
+      // ignore
+    }
   }
 
   async flush(): Promise<void> {
@@ -69,6 +77,14 @@ class PostHogSender implements vscode.TelemetrySender {
   }
 
   private enqueue(event: string, properties: Record<string, unknown>): void {
+    try {
+      this.push(event, properties);
+    } catch {
+      // ignore
+    }
+  }
+
+  private push(event: string, properties: Record<string, unknown>): void {
     if (this.queue.length >= MAX_QUEUE) return;
     this.queue.push({
       event,
@@ -100,29 +116,44 @@ class PostHogSender implements vscode.TelemetrySender {
   }
 }
 
+/**
+ * Telemetry must never affect the extension: every entry point below catches everything.
+ * If setup fails, telemetry is simply off; if sending fails, the event is dropped.
+ */
 export function initTelemetry(context: vscode.ExtensionContext): void {
-  if (!POSTHOG_KEY) return;
-  if (context.extensionMode !== vscode.ExtensionMode.Production) return;
-  if (typeof fetch !== 'function') return;
+  try {
+    if (!POSTHOG_KEY) return;
+    if (context.extensionMode !== vscode.ExtensionMode.Production) return;
+    if (typeof fetch !== 'function' || typeof vscode.env.createTelemetryLogger !== 'function') return;
 
-  const sender = new PostHogSender(
-    POSTHOG_KEY,
-    POSTHOG_HOST,
-    vscode.env.machineId, // anonymous, per-install id provided by VS Code
-    context.extensionUri.fsPath,
-    vscode.env.appName,
-  );
-  // TelemetryLogger adds common properties (extension version, VS Code version, OS, app name)
-  // and reports unhandled errors thrown from this extension's code.
-  logger = vscode.env.createTelemetryLogger(sender);
-  context.subscriptions.push(logger);
+    const sender = new PostHogSender(
+      POSTHOG_KEY,
+      POSTHOG_HOST,
+      vscode.env.machineId, // anonymous, per-install id provided by VS Code
+      context.extensionUri.fsPath,
+      vscode.env.appName,
+    );
+    // TelemetryLogger adds common properties (extension version, VS Code version, OS)
+    // and reports unhandled errors thrown from this extension's code.
+    logger = vscode.env.createTelemetryLogger(sender);
+    context.subscriptions.push(logger);
+  } catch {
+    logger = undefined;
+  }
 }
 
 export function trackToolRun(event: ToolRunEvent): void {
-  logger?.logUsage('tool.run', { ...event });
+  try {
+    logger?.logUsage('tool.run', { ...event });
+  } catch {
+    // ignore
+  }
 }
 
 export function trackBug(err: unknown, toolId: string): void {
-  if (!logger) return;
-  logger.logError(err instanceof Error ? err : new Error(String(err)), { toolId });
+  try {
+    logger?.logError(err instanceof Error ? err : new Error(String(err)), { toolId });
+  } catch {
+    // ignore
+  }
 }

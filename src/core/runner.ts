@@ -62,17 +62,24 @@ export async function runTool(tool: Tool, options: RunOptions = {}): Promise<voi
   const started = Date.now();
   let durationMs = 0;
 
-  const report = (outcome: RunOutcome, err?: unknown) =>
-    trackToolRun({
-      toolId: tool.id,
-      source: options.source ?? 'command',
-      ranges: ranges.length,
-      wholeDocument: tool.input !== 'none' && editor.selections.every((s) => s.isEmpty),
-      outputMode: output,
-      outcome,
-      durationMs,
-      errorType: err === undefined ? undefined : errorType(err),
-    });
+  // Telemetry must never block or break a run, so any failure in it is ignored.
+  const report = (outcome: RunOutcome, err?: unknown) => {
+    try {
+      trackToolRun({
+        toolId: tool.id,
+        source: options.source ?? 'command',
+        ranges: ranges.length,
+        wholeDocument: tool.input !== 'none' && editor.selections.every((s) => s.isEmpty),
+        outputMode: output,
+        outcome,
+        durationMs,
+        errorType: err === undefined ? undefined : errorType(err),
+      });
+      if (outcome === 'bug') trackBug(err, tool.id);
+    } catch {
+      // ignore
+    }
+  };
 
   let results: string[];
   try {
@@ -88,7 +95,6 @@ export async function runTool(tool: Tool, options: RunOptions = {}): Promise<voi
     } else {
       // Not a validation failure: a bug in the tool. Report it with a (scrubbed) stack trace.
       report('bug', err);
-      trackBug(err, tool.id);
     }
     void vscode.window.showErrorMessage(`Multitool ${title}: ${errorMessage(err)}`);
     return;

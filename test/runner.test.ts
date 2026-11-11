@@ -11,12 +11,19 @@ const state = vi.hoisted(() => ({
   infos: [] as string[],
   opened: [] as { content: string; language: string }[],
   runs: [] as Record<string, unknown>[],
+  telemetryThrows: false,
   bugs: [] as { err: unknown; toolId: string }[],
 }));
 
 vi.mock('../src/telemetry', () => ({
-  trackToolRun: (e: Record<string, unknown>) => void state.runs.push(e),
-  trackBug: (err: unknown, toolId: string) => void state.bugs.push({ err, toolId }),
+  trackToolRun: (e: Record<string, unknown>) => {
+    if (state.telemetryThrows) throw new Error('telemetry down');
+    state.runs.push(e);
+  },
+  trackBug: (err: unknown, toolId: string) => {
+    if (state.telemetryThrows) throw new Error('telemetry down');
+    state.bugs.push({ err, toolId });
+  },
 }));
 
 vi.mock('vscode', () => {
@@ -97,6 +104,7 @@ function setDoc(text: string, ...selections: [number, number][]) {
   state.opened = [];
   state.runs = [];
   state.bugs = [];
+  state.telemetryThrows = false;
 }
 
 describe('runner', () => {
@@ -187,5 +195,19 @@ describe('runner', () => {
       expect(state.bugs).toEqual([{ err: expect.any(TypeError), toolId: 'test.broken' }]);
       expect(state.errors[0]).toBe('Multitool Test Broken: boom');
     });
+  });
+
+  it('still applies every output mode when telemetry throws', async () => {
+    setDoc('{"a":1}');
+    state.telemetryThrows = true;
+    await runTool(getTool('json.minify'));
+    expect(state.text).toBe('{"a":1}');
+    await runTool(getTool('json.format'));
+    expect(state.text).toBe('{\n  "a": 1\n}');
+    await runTool(getTool('base64.encode'), { output: 'newDocument' });
+    expect(state.opened).toHaveLength(1);
+    await runTool(getTool('hash.md5'));
+    expect(state.infos).toHaveLength(1);
+    expect(state.errors).toEqual([]);
   });
 });
