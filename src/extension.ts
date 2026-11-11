@@ -3,10 +3,12 @@ import { tools } from './tools';
 import { commandId, type Tool } from './core/tool';
 import { runTool } from './core/runner';
 import { pickTool } from './core/picker';
+import { initTelemetry } from './telemetry';
 
 const LAST_TOOL_KEY = 'multitool.lastToolId';
 
 export function activate(context: vscode.ExtensionContext): void {
+  initTelemetry(context);
   const byId = new Map(tools.map((t) => [t.id, t]));
 
   const remember = (tool: Tool) => context.workspaceState.update(LAST_TOOL_KEY, tool.id);
@@ -26,13 +28,13 @@ export function activate(context: vscode.ExtensionContext): void {
       const tool = await pickTool(tools, 'Multitool: pick a tool to run on the selection or document');
       if (!tool) return;
       await remember(tool);
-      await runTool(tool);
+      await runTool(tool, { source: 'picker' });
     }),
     vscode.commands.registerCommand('multitool.runToolToNewTab', async () => {
       const tool = await pickTool(tools, 'Multitool: pick a tool — the result opens in a new tab');
       if (!tool) return;
       await remember(tool);
-      await runTool(tool, { output: 'newDocument' });
+      await runTool(tool, { output: 'newDocument', source: 'pickerNewTab' });
     }),
     vscode.commands.registerCommand('multitool.repeatLastTool', async () => {
       const id = context.workspaceState.get<string>(LAST_TOOL_KEY);
@@ -41,7 +43,7 @@ export function activate(context: vscode.ExtensionContext): void {
         await vscode.commands.executeCommand('multitool.runTool');
         return;
       }
-      await runTool(tool);
+      await runTool(tool, { source: 'repeatLast' });
     }),
   );
 }

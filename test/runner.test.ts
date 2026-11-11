@@ -10,6 +10,13 @@ const state = vi.hoisted(() => ({
   errors: [] as string[],
   infos: [] as string[],
   opened: [] as { content: string; language: string }[],
+  runs: [] as Record<string, unknown>[],
+  bugs: [] as { err: unknown; toolId: string }[],
+}));
+
+vi.mock('../src/telemetry', () => ({
+  trackToolRun: (e: Record<string, unknown>) => void state.runs.push(e),
+  trackBug: (err: unknown, toolId: string) => void state.bugs.push({ err, toolId }),
 }));
 
 vi.mock('vscode', () => {
@@ -80,6 +87,7 @@ vi.mock('vscode', () => {
 
 import { runTool } from '../src/core/runner';
 import { getTool } from './helpers';
+import { defineTool } from '../src/core/tool';
 
 function setDoc(text: string, ...selections: [number, number][]) {
   state.text = text;
@@ -87,6 +95,8 @@ function setDoc(text: string, ...selections: [number, number][]) {
   state.errors = [];
   state.infos = [];
   state.opened = [];
+  state.runs = [];
+  state.bugs = [];
 }
 
 describe('runner', () => {
@@ -134,5 +144,48 @@ describe('runner', () => {
 
     await runTool(getTool('base64.encode'), { output: 'newDocument' });
     expect(state.opened[1].content).toBe(Buffer.from('https://x.dev/?a=1').toString('base64'));
+  });
+
+  describe('telemetry', () => {
+    it('reports a successful run without any of the text', async () => {
+      setDoc('secret {"a":1}', [7, 14]);
+      await runTool(getTool('json.minify'), { source: 'picker' });
+      expect(state.runs).toEqual([
+        expect.objectContaining({
+          toolId: 'json.minify',
+          source: 'picker',
+          ranges: 1,
+          wholeDocument: false,
+          outputMode: 'replace',
+          outcome: 'ok',
+          errorType: undefined,
+        }),
+      ]);
+      expect(JSON.stringify(state.runs)).not.toContain('secret');
+      expect(state.bugs).toEqual([]);
+    });
+
+    it('reports invalid input as inputError, not as a bug', async () => {
+      setDoc('{bad json}');
+      await runTool(getTool('json.format'));
+      expect(state.runs[0]).toMatchObject({ outcome: 'inputError', errorType: 'ToolError', wholeDocument: true });
+      expect(state.bugs).toEqual([]);
+    });
+
+    it('reports an unexpected exception as a bug with the error', async () => {
+      const broken = defineTool({
+        id: 'test.broken',
+        category: 'Test',
+        title: 'Broken',
+        run: () => {
+          throw new TypeError('boom');
+        },
+      });
+      setDoc('x');
+      await runTool(broken);
+      expect(state.runs[0]).toMatchObject({ toolId: 'test.broken', source: 'command', outcome: 'bug', errorType: 'TypeError' });
+      expect(state.bugs).toEqual([{ err: expect.any(TypeError), toolId: 'test.broken' }]);
+      expect(state.errors[0]).toBe('Multitool Test Broken: boom');
+    });
   });
 });

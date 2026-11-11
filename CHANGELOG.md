@@ -2,6 +2,12 @@
 
 All notable changes to Dev Multitool are listed here.
 
+## Unreleased
+
+- Anonymous usage and error telemetry (PostHog). Follows VS Code's `telemetry.telemetryLevel` setting;
+  never sends your text, file names or paths. See "Telemetry" in the README.
+- URL Encode Component shows a clear error instead of "URI malformed" for text with an invalid Unicode character.
+
 ## 0.1.2 — 2026-11-10
 
 - README: fix the broken icon image and links on the Marketplace page.

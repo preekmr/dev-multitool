@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import { displayTitle, type Tool, type ToolContext, ToolError } from './tool';
+import { errorType, type RunOutcome, type RunSource } from './telemetry-format';
+import { trackBug, trackToolRun } from '../telemetry';
 
 type Output = NonNullable<Tool['output']>;
 
@@ -42,6 +44,8 @@ function errorMessage(err: unknown): string {
 export interface RunOptions {
   /** Override the tool's default output mode. */
   output?: Output;
+  /** How the run was started, for usage telemetry. Default: 'command'. */
+  source?: RunSource;
 }
 
 export async function runTool(tool: Tool, options: RunOptions = {}): Promise<void> {
@@ -54,6 +58,21 @@ export async function runTool(tool: Tool, options: RunOptions = {}): Promise<voi
 
   const ctx = buildContext(editor);
   const ranges = targetRanges(editor, tool);
+  const output = options.output ?? tool.output ?? 'replace';
+  const started = Date.now();
+  let durationMs = 0;
+
+  const report = (outcome: RunOutcome, err?: unknown) =>
+    trackToolRun({
+      toolId: tool.id,
+      source: options.source ?? 'command',
+      ranges: ranges.length,
+      wholeDocument: tool.input !== 'none' && editor.selections.every((s) => s.isEmpty),
+      outputMode: output,
+      outcome,
+      durationMs,
+      errorType: err === undefined ? undefined : errorType(err),
+    });
 
   let results: string[];
   try {
@@ -61,12 +80,20 @@ export async function runTool(tool: Tool, options: RunOptions = {}): Promise<voi
     for (const range of ranges) {
       results.push(await tool.run(editor.document.getText(range), ctx));
     }
+    durationMs = Date.now() - started;
   } catch (err) {
+    durationMs = Date.now() - started;
+    if (err instanceof ToolError) {
+      report('inputError', err);
+    } else {
+      // Not a validation failure: a bug in the tool. Report it with a (scrubbed) stack trace.
+      report('bug', err);
+      trackBug(err, tool.id);
+    }
     void vscode.window.showErrorMessage(`Multitool ${title}: ${errorMessage(err)}`);
     return;
   }
 
-  const output = options.output ?? tool.output ?? 'replace';
   const joined = () => results.join(ctx.eol + ctx.eol);
 
   switch (output) {
@@ -74,10 +101,12 @@ export async function runTool(tool: Tool, options: RunOptions = {}): Promise<voi
       const ok = await editor.edit((edit) => {
         ranges.forEach((range, i) => edit.replace(range, results[i]));
       });
+      report(ok ? 'ok' : 'editFailed');
       if (!ok) void vscode.window.showErrorMessage(`Multitool ${title}: could not apply the edit.`);
       return;
     }
     case 'newDocument': {
+      report('ok');
       const doc = await vscode.workspace.openTextDocument({
         content: joined(),
         language: tool.outputLanguage ?? 'plaintext',
@@ -86,6 +115,7 @@ export async function runTool(tool: Tool, options: RunOptions = {}): Promise<voi
       return;
     }
     case 'message': {
+      report('ok');
       const text = joined();
       const pick = await vscode.window.showInformationMessage(`${title}: ${text}`, 'Copy');
       if (pick === 'Copy') await vscode.env.clipboard.writeText(text);

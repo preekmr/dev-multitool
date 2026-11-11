@@ -56,6 +56,11 @@ jobs:
       - name: Package
         env:
           TAG: ${{ steps.version.outputs.tag }}
+          # Anonymous telemetry (see README "Telemetry"). Repository variables, not secrets:
+          # a PostHog project key is write-only and ships inside the extension anyway.
+          # If POSTHOG_KEY is unset, the build has telemetry turned off.
+          POSTHOG_KEY: ${{ vars.POSTHOG_KEY }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST }}
         run: npx vsce package --out "dev-multitool-${TAG}.vsix"
 
       - name: Publish to VS Code Marketplace
