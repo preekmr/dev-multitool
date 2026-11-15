@@ -1,5 +1,7 @@
 # Dev Multitool for VS Code
 
+**Website:** [multitool.preekmr.me](https://multitool.preekmr.me)
+
 Format, convert, encode and decode text without leaving the editor. Select some text (or nothing, to use the
 whole file), open the Command Palette and type the tool name.
 

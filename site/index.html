@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dev Multitool for VS Code — JSON, Base64, JWT &amp; 47 text tools</title>
+<meta name="description" content="Free, open-source VS Code extension to format, convert, encode and decode text in the editor: JSON, XML, YAML, Base64, URL, JWT, hashes, case conversion and more.">
+<meta name="keywords" content="VS Code extension, JSON formatter, Base64 decode, JWT decoder, URL encode, YAML to JSON, hash, case converter, developer tools, Open VSX">
+<meta name="author" content="preekmr">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#0F1024">
+<meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://multitool.preekmr.me/">
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dev Multitool">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://multitool.preekmr.me/">
+<meta property="og:title" content="Dev Multitool — the pocket knife for text in VS Code">
+<meta property="og:description" content="47 free tools for JSON, XML, YAML, Base64, URL, JWT, hashes and case conversion — right in your editor, with your text never leaving your machine.">
+<meta property="og:image" content="https://multitool.preekmr.me/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Dev Multitool: format, convert, encode and decode text without leaving VS Code">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dev Multitool — the pocket knife for text in VS Code">
+<meta name="twitter:description" content="47 free tools for JSON, XML, YAML, Base64, URL, JWT, hashes and case conversion — right in your editor.">
+<meta name="twitter:image" content="https://multitool.preekmr.me/og-image.png">
+<meta name="twitter:image:alt" content="Dev Multitool: format, convert, encode and decode text without leaving VS Code">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://multitool.preekmr.me/#app",
+      "name": "Dev Multitool",
+      "alternateName": "Dev Multitool for VS Code",
+      "description": "VS Code extension to format, convert, encode and decode text without leaving the editor: JSON, XML, YAML, Base64, URL, JWT, hashes, case conversion and more.",
+      "url": "https://multitool.preekmr.me/",
+      "image": "https://multitool.preekmr.me/og-image.png",
+      "applicationCategory": "DeveloperApplication",
+      "applicationSubCategory": "Visual Studio Code extension",
+      "operatingSystem": "Windows, macOS, Linux",
+      "isAccessibleForFree": true,
+      "license": "https://opensource.org/licenses/MIT",
+      "downloadUrl": "https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool",
+      "installUrl": "https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool",
+      "codeRepository": "https://github.com/preekmr/dev-multitool",
+      "sameAs": [
+        "https://github.com/preekmr/dev-multitool",
+        "https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool",
+        "https://open-vsx.org/extension/preekmr/dev-multitool"
+      ],
+      "featureList": "JSON format, minify, sort keys, validate, escape and convert to YAML; XML format and validate; YAML to JSON; Base64, Base64URL, Hex, URL and HTML entity encode/decode; JWT decode with expiry; MD5, SHA-1, SHA-256, SHA-512 hashes; case conversion; line sorting and de-duplication; Unix/ISO timestamps; UUID v4",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "author": { "@type": "Person", "name": "preekmr", "url": "https://github.com/preekmr" }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://multitool.preekmr.me/#website",
+      "url": "https://multitool.preekmr.me/",
+      "name": "Dev Multitool",
+      "inLanguage": "en"
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap">
+
+<style>
+:root{
+  --bg:#0F1024; --bg2:#13142C; --surface:#171936; --line:#23264A; --line2:#2A2D55; --line3:#3A3E72;
+  --text:#ECEDF7; --soft:#C3C5E0; --muted:#B8BBDA; --dim:#A3A6C8;
+  --amber:#F6B53D; --amber-hi:#FFD27A; --indigo:#3B3F9E; --indigo-hi:#5B61D6;
+  --display:'Space Grotesk',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Inter,system-ui,-apple-system,'Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--amber)} a:hover{color:var(--amber-hi)}
+code,pre{font-family:var(--mono)}
+img{max-width:100%}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-0.02em}
+p{margin:0}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:24px}
+.skip{position:absolute;left:-9999px;top:8px;background:var(--amber);color:#14152B;padding:8px 12px;border-radius:6px;z-index:10}
+.skip:focus{left:8px}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+
+/* nav */
+.top{border-bottom:1px solid var(--line)}
+.nav{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;padding-block:18px}
+.brand{display:flex;align-items:center;gap:12px;color:var(--text);text-decoration:none;font:700 20px var(--display)}
+.brand img{width:36px;height:36px;border-radius:8px}
+.links{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;font-size:15px}
+.links a{color:var(--soft);text-decoration:none} .links a:hover{color:var(--text)}
+
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:12px 22px;border-radius:10px;font-weight:600;text-decoration:none;border:1px solid var(--line3);color:var(--text)}
+.btn:hover{color:var(--text);border-color:var(--indigo-hi)}
+.btn.primary{background:var(--amber);border-color:var(--amber);color:#14152B}
+.btn.primary:hover{background:var(--amber-hi);color:#14152B}
+.btn.sm{min-height:44px;padding:8px 18px;border-radius:8px}
+.links .btn.primary{color:#14152B}
+
+/* hero */
+.hero{display:flex;flex-wrap:wrap;gap:56px;align-items:center;padding-block:88px 72px}
+.hero-copy{flex:1 1 440px;min-width:0;display:flex;flex-direction:column;gap:24px}
+.pill{align-self:flex-start;font-size:13px;font-weight:500;color:var(--amber);border:1px solid #4A3D1C;background:#1E1A12;padding:6px 12px;border-radius:999px}
+h1{font-weight:700;font-size:clamp(40px,5.5vw,64px);line-height:1.04;letter-spacing:-0.025em}
+.lede{font-size:19px;color:var(--muted);max-width:34em}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.install-cmd{display:flex;flex-direction:column;gap:8px}
+.install-cmd span{font-size:13px;color:var(--dim)}
+.install-cmd code{align-self:flex-start;font-size:14px;background:var(--surface);border:1px solid var(--line2);padding:10px 14px;border-radius:8px}
+
+.demo{flex:1 1 520px;min-width:0;background:var(--surface);border:1px solid var(--line2);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.demo-bar{display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--line2);font-size:13px;color:var(--dim)}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--line3)}
+.demo-bar .dot:last-of-type{margin-right:8px}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 0}
+.tab{font:500 13px Inter,sans-serif;background:transparent;color:var(--soft);border:1px solid var(--line2);border-radius:8px;padding:10px 14px;min-height:44px;cursor:pointer}
+.tab:hover{color:var(--text);border-color:var(--line3)}
+.tab[aria-selected="true"]{background:var(--indigo);color:#fff;border-color:var(--indigo-hi)}
+.demo-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.cmd{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--indigo-hi);border-radius:8px;padding:10px 12px;font:13px var(--mono)}
+.label{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.label.out{color:var(--amber)}
+.demo pre{margin:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.demo pre.in{color:var(--soft);word-break:break-all}
+.demo pre.res{min-height:120px}
+
+/* strip */
+.strip{border-block:1px solid var(--line);background:var(--bg2)}
+.strip ul{list-style:none;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 36px;padding-block:22px;font-size:15px;color:var(--dim)}
+.strip strong{color:var(--text)}
+
+/* sections */
+section.block{padding-block:96px}
+.head{display:flex;flex-direction:column;gap:12px;max-width:720px;margin-bottom:40px}
+h2{font-weight:700;font-size:clamp(30px,3.6vw,44px);line-height:1.1}
+.head p{font-size:18px;color:var(--muted)}
+.grid{display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line2);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:21px;font-weight:600}
+.card p{color:var(--muted)}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:20px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.steps li{border-top:2px solid var(--amber);padding-top:20px;display:flex;flex-direction:column;gap:10px}
+.steps .n{font:14px var(--mono);color:var(--amber)}
+.steps h3{font-size:22px;font-weight:600}
+.steps p{color:var(--muted)}
+.steps code,.inline code{color:var(--text)}
+
+.alt{background:var(--bg2);border-block:1px solid var(--line)}
+.tools{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.tool{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:22px;display:flex;flex-direction:column;gap:14px}
+.tool header{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.tool h3{font-size:19px;font-weight:600}
+.tool header span{font-size:13px;color:var(--dim)}
+.chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.chips li{font-size:13px;background:var(--bg);border:1px solid var(--line2);color:#DADCF0;border-radius:6px;padding:4px 10px}
+
+.split{display:flex;flex-wrap:wrap;gap:48px;align-items:center}
+.split > div{flex:1 1 420px;min-width:0}
+.split .copy{display:flex;flex-direction:column;gap:18px}
+.split .copy > p{font-size:18px;color:var(--muted)}
+.ticks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;color:var(--soft)}
+.ticks li{display:flex;gap:12px}
+.ticks li::before{content:"—";color:var(--amber)}
+.ticks strong{color:var(--text)}
+.code{background:var(--surface);border:1px solid var(--line2);border-radius:14px;overflow:hidden}
+.code .fname{padding:12px 16px;border-bottom:1px solid var(--line2);font:13px var(--mono);color:var(--dim)}
+.code pre{margin:0;padding:20px;font-size:13.5px;line-height:1.7;overflow-x:auto}
+
+.privacy{background:var(--surface);border:1px solid var(--line2);border-radius:18px;padding:clamp(28px,4vw,56px);display:flex;flex-wrap:wrap;gap:40px}
+.privacy > div{flex:1 1 360px;min-width:0}
+.privacy .copy{display:flex;flex-direction:column;gap:14px}
+.privacy h2{font-size:clamp(28px,3vw,38px);line-height:1.15}
+.privacy .copy p{color:var(--muted)}
+.privacy .copy code{color:var(--text)}
+.facts{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.facts dt{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+.facts dt.dim{color:var(--dim)}
+.facts dd{margin:0;color:var(--soft);font-size:15px}
+
+.cta{border-top:1px solid var(--line)}
+.cta .wrap{max-width:880px;padding-block:104px;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center}
+.cta img{width:88px;height:88px;border-radius:20px}
+.cta h2{font-size:clamp(32px,4.4vw,52px);line-height:1.08;letter-spacing:-0.025em}
+.cta p{font-size:18px;color:var(--muted);max-width:36em}
+.cta .row{justify-content:center}
+
+footer{border-top:1px solid var(--line)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-block:28px;font-size:14px;color:var(--dim)}
+footer nav{display:flex;flex-wrap:wrap;gap:20px}
+footer a{color:var(--dim)} footer a:hover{color:var(--text)}
+
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <nav class="wrap nav" aria-label="Main">
+    <a class="brand" href="/" aria-label="Dev Multitool home">
+      <img src="/icon-128.png" alt="" width="36" height="36">
+      Dev Multitool
+    </a>
+    <div class="links">
+      <a href="#tools">Tools</a>
+      <a href="#how">How it works</a>
+      <a href="#privacy">Privacy</a>
+      <a href="https://github.com/preekmr/dev-multitool">GitHub</a>
+      <a class="btn primary sm" href="https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool">Install free</a>
+    </div>
+  </nav>
+</header>
+
+<main id="main">
+  <section class="wrap hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <span class="pill">Free &amp; open source · MIT</span>
+      <h1 id="hero-title">The pocket knife for text in your editor.</h1>
+      <p class="lede">Format, convert, encode and decode without leaving VS Code. 47 tools for JSON, XML, YAML, Base64, URL, JWT, hashes, case conversion and more — one keystroke away, no browser tab, no pasting secrets into random websites.</p>
+      <div class="row">
+        <a class="btn primary" href="https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool">Get it on VS Code Marketplace</a>
+        <a class="btn" href="https://open-vsx.org/extension/preekmr/dev-multitool">Open VSX</a>
+      </div>
+      <div class="install-cmd">
+        <span>Or from the Quick Open bar (Cmd/Ctrl+P):</span>
+        <code>ext install preekmr.dev-multitool</code>
+      </div>
+    </div>
+
+    <div class="demo" aria-label="Interactive demo">
+      <div class="demo-bar"><span class="dot" aria-hidden="true"></span><span class="dot" aria-hidden="true"></span><span class="dot" aria-hidden="true"></span>Try a tool</div>
+      <div class="tabs" role="tablist" aria-label="Demo tools">
+        <button class="tab" role="tab" id="tab-0" aria-controls="demo-panel" aria-selected="true">JSON Format</button>
+        <button class="tab" role="tab" id="tab-1" aria-controls="demo-panel" aria-selected="false" tabindex="-1">Base64 Decode</button>
+        <button class="tab" role="tab" id="tab-2" aria-controls="demo-panel" aria-selected="false" tabindex="-1">JWT Decode</button>
+        <button class="tab" role="tab" id="tab-3" aria-controls="demo-panel" aria-selected="false" tabindex="-1">snake_case</button>
+      </div>
+      <div class="demo-body" id="demo-panel" role="tabpanel" aria-labelledby="tab-0" aria-live="polite">
+        <div class="cmd"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A3A6C8" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg><span data-f="command">Multitool: JSON Format</span></div>
+        <div class="label">Selection</div>
+        <pre class="in" data-f="before">{"name":"dev-multitool","tools":47,"tags":["json","jwt"]}</pre>
+        <div class="label out" data-f="where">Replaced in place</div>
+        <pre class="res" data-f="after">{
+  "name": "dev-multitool",
+  "tools": 47,
+  "tags": [
+    "json",
+    "jwt"
+  ]
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="strip" aria-label="Supported editors">
+    <ul class="wrap">
+      <li>Works in</li>
+      <li><strong>VS Code</strong></li>
+      <li><strong>VSCodium</strong></li>
+      <li><strong>Cursor</strong></li>
+      <li><strong>Windsurf</strong></li>
+      <li><strong>Gitpod</strong></li>
+      <li>and any editor on Open VSX</li>
+    </ul>
+  </section>
+
+  <section class="wrap block" aria-labelledby="why-title">
+    <div class="head">
+      <h2 id="why-title">Stop alt-tabbing to online converters.</h2>
+      <p>Every developer has a bookmark folder of "JSON formatter", "base64 decode" and "jwt.io". Dev Multitool puts all of them where your text already is — and keeps your tokens and payloads on your machine.</p>
+    </div>
+    <div class="grid">
+      <article class="card">
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F6B53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+        <h3>Right in the editor</h3>
+        <p>Command Palette, a grouped picker on Cmd+Alt+Shift+D, or the right-click menu. Results replace your selection — undo with Cmd+Z.</p>
+      </article>
+      <article class="card">
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F6B53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>
+        <h3>Your text stays local</h3>
+        <p>Everything runs inside VS Code. JWTs, API payloads and config never leave your machine — no web service in between.</p>
+      </article>
+      <article class="card">
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F6B53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M4 12h16M4 17h7"/><path d="M17 4v6M20 7h-6"/></svg>
+        <h3>Multi-cursor aware</h3>
+        <p>Each selection is processed on its own. Put ten cursors on ten Base64 values and decode them all at once.</p>
+      </article>
+      <article class="card">
+        <svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F6B53D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>
+        <h3>Bind anything to a key</h3>
+        <p>Every tool is a real command. Map JSON Format to Cmd+Alt+J, or bind Repeat Last Tool and fly.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="how" class="wrap block" style="padding-top:24px" aria-labelledby="how-title">
+    <div class="head"><h2 id="how-title">Three steps. Zero context switches.</h2></div>
+    <ol class="steps">
+      <li><span class="n">01</span><h3>Select text</h3><p>Highlight a value, use several cursors, or select nothing to work on the whole file.</p></li>
+      <li><span class="n">02</span><h3>Pick a tool</h3><p>Type <code>base64</code>, <code>json format</code> or <code>jwt</code> in the Command Palette — every tool is listed as <code>Multitool: …</code>.</p></li>
+      <li><span class="n">03</span><h3>Get the result</h3><p>In place, in a new tab (JWT decode, URL parse), or as a notification with a Copy button (hashes, counts, validation).</p></li>
+    </ol>
+  </section>
+
+  <section id="tools" class="alt" aria-labelledby="tools-title">
+    <div class="wrap block">
+      <div class="head">
+        <h2 id="tools-title">47 tools, 13 categories.</h2>
+        <p>The everyday conversions you reach for most — and new tools are a single function to add.</p>
+      </div>
+      <div class="tools">
+        <article class="tool"><header><h3>JSON</h3><span>7 tools</span></header><ul class="chips"><li>Format</li><li>Minify</li><li>Sort Keys</li><li>Validate</li><li>Escape</li><li>Unescape</li><li>to YAML</li></ul></article>
+        <article class="tool"><header><h3>XML &amp; YAML</h3><span>4 tools</span></header><ul class="chips"><li>XML Format</li><li>XML Minify</li><li>XML Validate</li><li>YAML to JSON</li></ul></article>
+        <article class="tool"><header><h3>Base64</h3><span>4 tools</span></header><ul class="chips"><li>Encode</li><li>Decode</li><li>URL-safe Encode</li><li>URL-safe Decode</li></ul></article>
+        <article class="tool"><header><h3>URL</h3><span>3 tools</span></header><ul class="chips"><li>Encode Component</li><li>Decode</li><li>Parse to JSON</li></ul></article>
+        <article class="tool"><header><h3>JWT</h3><span>1 tool</span></header><ul class="chips"><li>Decode header &amp; payload</li><li>Expiry in human time</li></ul></article>
+        <article class="tool"><header><h3>Hash</h3><span>4 tools</span></header><ul class="chips"><li>MD5</li><li>SHA-1</li><li>SHA-256</li><li>SHA-512</li></ul></article>
+        <article class="tool"><header><h3>HTML &amp; Hex</h3><span>4 tools</span></header><ul class="chips"><li>Escape entities</li><li>Unescape entities</li><li>Hex Encode</li><li>Hex Decode</li></ul></article>
+        <article class="tool"><header><h3>Case</h3><span>8 tools</span></header><ul class="chips"><li>camelCase</li><li>PascalCase</li><li>snake_case</li><li>CONSTANT_CASE</li><li>kebab-case</li><li>Title Case</li><li>UPPER</li><li>lower</li></ul></article>
+        <article class="tool"><header><h3>Lines</h3><span>7 tools</span></header><ul class="chips"><li>Natural sort ↑</li><li>Sort ↓</li><li>Remove duplicates</li><li>Reverse</li><li>Remove blanks</li><li>Trim</li><li>Count</li></ul></article>
+        <article class="tool"><header><h3>Time &amp; Generate</h3><span>5 tools</span></header><ul class="chips"><li>Unix → ISO 8601</li><li>Date → Unix</li><li>Insert ISO timestamp</li><li>Insert Unix timestamp</li><li>UUID v4</li></ul></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap block" aria-labelledby="keys-title">
+    <div class="split">
+      <div class="copy">
+        <h2 id="keys-title">Built for keyboard people.</h2>
+        <p>Every tool has a command ID, so any of them can live on a shortcut. Pair that with Repeat Last Tool and the conversions you do fifty times a day become one chord.</p>
+        <ul class="ticks">
+          <li><span><strong>Run Tool (Result in New Tab)</strong> keeps the original text untouched.</span></li>
+          <li><span><strong>Formatters follow your editor</strong> — indentation is auto, tab, or any number of spaces.</span></li>
+          <li><span><strong>Clear errors</strong> with line and column for invalid JSON and XML.</span></li>
+        </ul>
+      </div>
+      <div class="code">
+        <div class="fname">keybindings.json</div>
+<pre><code>[
+  { "key": "cmd+alt+j", "command": "multitool.json.format" },
+  { "key": "cmd+alt+b", "command": "multitool.base64.decode" },
+  { "key": "cmd+alt+r", "command": "multitool.repeatLastTool" }
+]</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy" class="wrap" style="padding-bottom:96px" aria-labelledby="privacy-title">
+    <div class="privacy">
+      <div class="copy">
+        <h2 id="privacy-title">Privacy you can read in one screen.</h2>
+        <p>Your text is processed locally and never sent anywhere. Anonymous usage telemetry helps find bugs, and it follows VS Code's own <code>telemetry.telemetryLevel</code> — set it to <code>off</code> and nothing is sent.</p>
+        <a href="https://github.com/preekmr/dev-multitool#privacy">Read exactly what is collected →</a>
+      </div>
+      <dl class="facts">
+        <div><dt>Never sent</dt><dd>Your text or selections, error messages, file names, paths, workspace names, IP-based location</dd></div>
+        <div><dt class="dim">Sent, anonymously</dt><dd>Tool id, duration, success or error type, extension and VS Code version, OS</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="cta" aria-labelledby="cta-title">
+    <div class="wrap">
+      <img src="/icon-256.png" alt="Dev Multitool icon" width="88" height="88" loading="lazy">
+      <h2 id="cta-title">Put the whole toolbox in your editor.</h2>
+      <p>Free, MIT-licensed and open source. Missing a tool you use every day? Adding one is a single function — pull requests welcome.</p>
+      <div class="row">
+        <a class="btn primary" href="https://marketplace.visualstudio.com/items?itemName=preekmr.dev-multitool">Install for VS Code</a>
+        <a class="btn" href="https://open-vsx.org/extension/preekmr/dev-multitool">Open VSX</a>
+        <a class="btn" href="https://github.com/preekmr/dev-multitool"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>Star on GitHub</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Dev Multitool · MIT License · by <a href="https://github.com/preekmr">preekmr</a></span>
+    <nav aria-label="Footer">
+      <a href="https://github.com/preekmr/dev-multitool/blob/main/CHANGELOG.md">Changelog</a>
+      <a href="https://github.com/preekmr/dev-multitool/blob/main/CONTRIBUTING.md">Contributing</a>
+      <a href="https://github.com/preekmr/dev-multitool/issues">Report an issue</a>
+    </nav>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var demos = [
+    { command: 'Multitool: JSON Format', where: 'Replaced in place',
+      before: '{"name":"dev-multitool","tools":47,"tags":["json","jwt"]}',
+      after: '{\n  "name": "dev-multitool",\n  "tools": 47,\n  "tags": [\n    "json",\n    "jwt"\n  ]\n}' },
+    { command: 'Multitool: Base64 Decode', where: 'Replaced in place',
+      before: 'SGVsbG8gZnJvbSBEZXYgTXVsdGl0b29s',
+      after: 'Hello from Dev Multitool' },
+    { command: 'Multitool: JWT Decode', where: 'Opened in a new tab',
+      before: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsIm5hbWUiOiJBZGEgTG92ZWxhY2UiLCJpYXQiOjE3NjMxNjQ4MDAsImV4cCI6MTc2MzI1MTIwMH0.sig',
+      after: '{\n  "header": { "alg": "HS256", "typ": "JWT" },\n  "payload": { "sub": "42", "name": "Ada Lovelace", ... },\n  "info": {\n    "status": "expired 364d 3h ago",\n    "exp": "2025-11-16T00:00:00.000Z",\n    "iat": "2025-11-15T00:00:00.000Z",\n    "note": "Signature is NOT verified."\n  }\n}' },
+    { command: 'Multitool: Case to snake_case', where: 'Replaced in place, line by line',
+      before: 'userAccountId\nCreatedAt\nlast-login-time',
+      after: 'user_account_id\ncreated_at\nlast_login_time' }
+  ];
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var panel = document.getElementById('demo-panel');
+  var fields = {};
+  panel.querySelectorAll('[data-f]').forEach(function (el) { fields[el.getAttribute('data-f')] = el; });
+  function show(i, focus) {
+    tabs.forEach(function (t, j) {
+      t.setAttribute('aria-selected', String(i === j));
+      t.tabIndex = i === j ? 0 : -1;
+    });
+    panel.setAttribute('aria-labelledby', 'tab-' + i);
+    Object.keys(fields).forEach(function (k) { fields[k].textContent = demos[i][k]; });
+    if (focus) tabs[i].focus();
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { show(i); });
+    t.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') show((i + 1) % tabs.length, true);
+      if (e.key === 'ArrowLeft') show((i - 1 + tabs.length) % tabs.length, true);
+    });
+  });
+})();
+</script>
+</body>
+</html>
