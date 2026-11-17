@@ -2,7 +2,7 @@
 
 All notable changes to Dev Multitool are listed here.
 
-## 0.3.0 — unreleased
+## 0.3.0 — 2026-11-17
 
 - **JSON Compare:** compare two JSON files or open tabs side by side, ignoring key order and formatting.
   Start it with **Multitool: JSON Compare with…** (Command Palette, editor tab or editor right-click menu) or by
