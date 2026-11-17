@@ -4,11 +4,14 @@ import { commandId, type Tool } from './core/tool';
 import { runTool } from './core/runner';
 import { pickTool } from './core/picker';
 import { initTelemetry } from './telemetry';
+import { registerJsonCompare } from './compare';
+import { COMPARE } from './compare/commands';
 
 const LAST_TOOL_KEY = 'multitool.lastToolId';
 
 export function activate(context: vscode.ExtensionContext): void {
   initTelemetry(context);
+  registerJsonCompare(context);
   const byId = new Map(tools.map((t) => [t.id, t]));
 
   const remember = (tool: Tool) => context.workspaceState.update(LAST_TOOL_KEY, tool.id);
@@ -25,16 +28,27 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('multitool.runTool', async () => {
-      const tool = await pickTool(tools, 'Multitool: pick a tool to run on the selection or document');
-      if (!tool) return;
-      await remember(tool);
-      await runTool(tool, { source: 'picker' });
+      const picked = await pickTool(tools, 'Multitool: pick a tool to run on the selection or document', [
+        {
+          category: 'JSON',
+          title: 'Compare with…',
+          description: 'Compare with another tab or file, ignoring key order and formatting',
+          command: COMPARE.compareWith,
+        },
+      ]);
+      if (!picked) return;
+      if ('command' in picked) {
+        await vscode.commands.executeCommand(picked.command);
+        return;
+      }
+      await remember(picked.tool);
+      await runTool(picked.tool, { source: 'picker' });
     }),
     vscode.commands.registerCommand('multitool.runToolToNewTab', async () => {
-      const tool = await pickTool(tools, 'Multitool: pick a tool — the result opens in a new tab');
-      if (!tool) return;
-      await remember(tool);
-      await runTool(tool, { output: 'newDocument', source: 'pickerNewTab' });
+      const picked = await pickTool(tools, 'Multitool: pick a tool — the result opens in a new tab');
+      if (!picked || !('tool' in picked)) return;
+      await remember(picked.tool);
+      await runTool(picked.tool, { output: 'newDocument', source: 'pickerNewTab' });
     }),
     vscode.commands.registerCommand('multitool.repeatLastTool', async () => {
       const id = context.workspaceState.get<string>(LAST_TOOL_KEY);

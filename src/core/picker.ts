@@ -1,22 +1,41 @@
 import * as vscode from 'vscode';
 import { displayTitle, type Tool } from './tool';
 
-interface ToolItem extends vscode.QuickPickItem {
-  tool?: Tool;
+/** A picker entry that runs a command instead of a text tool (e.g. JSON Compare). */
+export interface PickerCommand {
+  category: string;
+  title: string;
+  description?: string;
+  command: string;
 }
 
-/** Shows every tool, grouped by category. Resolves to the chosen tool, if any. */
-export async function pickTool(tools: readonly Tool[], placeHolder: string): Promise<Tool | undefined> {
-  const items: ToolItem[] = [];
+export type Picked = { tool: Tool } | { command: string };
+
+interface PickItem extends vscode.QuickPickItem {
+  picked_?: Picked;
+}
+
+/** Shows every tool (and extra commands), grouped by category. Resolves to the chosen entry, if any. */
+export async function pickTool(
+  tools: readonly Tool[],
+  placeHolder: string,
+  extras: readonly PickerCommand[] = [],
+): Promise<Picked | undefined> {
+  const entries = [
+    ...tools.map((tool) => ({ category: tool.category, label: displayTitle(tool), description: tool.description, picked: { tool } as Picked })),
+    ...extras.map((e) => ({ category: e.category, label: `${e.category} ${e.title}`, description: e.description, picked: { command: e.command } as Picked })),
+  ];
+  // Stable sort keeps each category's tools in registry order, extras last.
+  entries.sort((a, b) => a.category.localeCompare(b.category));
+  const items: PickItem[] = [];
   let currentCategory: string | undefined;
-  const sorted = [...tools].sort((a, b) => a.category.localeCompare(b.category));
-  for (const tool of sorted) {
-    if (tool.category !== currentCategory) {
-      currentCategory = tool.category;
-      items.push({ label: tool.category, kind: vscode.QuickPickItemKind.Separator });
+  for (const e of entries) {
+    if (e.category !== currentCategory) {
+      currentCategory = e.category;
+      items.push({ label: e.category, kind: vscode.QuickPickItemKind.Separator });
     }
-    items.push({ label: displayTitle(tool), description: tool.description, tool });
+    items.push({ label: e.label, description: e.description, picked_: e.picked });
   }
-  const picked = await vscode.window.showQuickPick(items, { placeHolder, matchOnDescription: true });
-  return picked?.tool;
+  const choice = await vscode.window.showQuickPick(items, { placeHolder, matchOnDescription: true });
+  return choice?.picked_;
 }

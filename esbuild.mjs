@@ -11,6 +11,9 @@ const ctx = await esbuild.context({
   target: 'node18',
   outfile: 'dist/extension.js',
   external: ['vscode'],
+  // Prefer packages' ES module builds. jsonc-parser's default UMD build loads its own files with
+  // require() calls the bundler cannot follow, which crashes the extension at startup.
+  mainFields: ['module', 'main'],
   // Telemetry is only enabled in release builds that set POSTHOG_KEY (see release.yml).
   define: {
     __POSTHOG_KEY__: JSON.stringify(process.env.POSTHOG_KEY ?? ''),

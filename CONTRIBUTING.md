@@ -8,6 +8,7 @@ Thanks for helping! Most contributions are new tools, and a tool is just a funct
 npm install
 npm test          # unit tests (no VS Code needed)
 npm run build     # bundle to dist/extension.js
+npm run check:bundle  # load the built bundle and check every command registers (also runs when packaging)
 ```
 
 Press `F5` in VS Code to launch an Extension Development Host with your local build.

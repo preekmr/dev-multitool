@@ -40,6 +40,34 @@ parse open the result in a new tab, hashes/validation/counts show a notification
 `Multitool: Run Tool (Result in New Tab)…` to send any tool's result to a new tab instead of replacing.
 `Multitool: Repeat Last Tool` re-runs the last tool you used — a good one to bind to a key.
 
+## JSON Compare
+
+Compare two JSON files or open tabs side by side. **Key order and formatting are ignored**, so only real
+differences show.
+
+- **From an editor:** with a JSON file or tab active, run **Multitool: JSON Compare with…** (Command Palette,
+  right-click on the editor tab, or the editor's right-click menu → Multitool → JSON). Pick another open tab
+  — unsaved and untitled tabs work too — or **Browse…** for a file. The picked file opens on the left.
+- **From the Explorer:** select two JSON files, right-click, **Multitool: JSON Compare Selected Files**.
+
+What you get:
+
+- VS Code's **side-by-side diff** of both files, formatted the same way and with keys sorted. Your files are
+  not changed; the diff shows read-only formatted copies.
+- A **JSON Diff** panel next to the Terminal listing every change by its path, e.g.
+  `~ $.user.name  "Pradeep" → "Pradeep B"`, `+ $.roles[1]  "admin"`, `− $.beta  true`, with type changes
+  flagged (`string → number`). Click a change to jump to it in the diff. **Copy as Markdown** (panel title bar)
+  gives you a table for a PR or ticket.
+
+Good to know:
+
+- JSON with comments and trailing commas (`tsconfig.json`, `settings.json`) works; comments are not compared.
+- Arrays are compared item by item, by position: an item inserted near the start of an array lists every later
+  item as changed in the panel (the side-by-side diff still shows just the inserted lines).
+- `1` and `1.0` are equal; `null` and a missing key are different. Integers above 2^53 lose precision, as in
+  JavaScript.
+- Set `multitool.jsonCompare.sortKeys` to `false` to see key-order changes in the side-by-side diff.
+
 ## Keybindings
 
 Open **Preferences: Open Keyboard Shortcuts (JSON)** and add entries using the command IDs from the table below:
@@ -60,6 +88,7 @@ Or open **Preferences: Open Keyboard Shortcuts**, search for `Multitool` and cli
 | --- | --- | --- |
 | `multitool.indent` | `"auto"` | Indentation for formatters: `"auto"` follows the editor, `"tab"`, or a number of spaces. |
 | `multitool.contextMenu.enabled` | `true` | Show the Multitool submenu in the editor right-click menu. |
+| `multitool.jsonCompare.sortKeys` | `true` | JSON Compare: sort keys on both sides so key order never shows as a difference. |
 
 ## All tools
 
@@ -128,7 +157,8 @@ to send nothing, or to `error` to send only error reports.
 
 What is sent, per tool run:
 
-- the tool id (e.g. `json.format`), how it was started (command, picker, repeat last), the output mode,
+- the tool id (e.g. `json.format`, or `json.compare` for JSON Compare), how it was started (command, picker,
+  repeat last, tab or Explorer right-click), the output mode,
   the number of selections, whether it ran on the whole document, how long it took, and whether it
   succeeded, failed on invalid input, or hit a bug (with the error type, e.g. `TypeError`);
 - the extension version, VS Code version, editor app name and operating system;

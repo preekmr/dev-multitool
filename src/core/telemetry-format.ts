@@ -9,8 +9,9 @@
  */
 
 /** How the tool was started. Command-palette, keybinding and context-menu runs all go through
- * the per-tool command, so VS Code cannot tell them apart; they share 'command'. */
-export type RunSource = 'command' | 'picker' | 'pickerNewTab' | 'repeatLast';
+ * the per-tool command, so VS Code cannot tell them apart; they share 'command'.
+ * JSON Compare can tell: 'contextMenu' (editor tab right-click) and 'explorer' (two files selected). */
+export type RunSource = 'command' | 'picker' | 'pickerNewTab' | 'repeatLast' | 'contextMenu' | 'explorer';
 
 /** ok = output applied; inputError = ToolError (invalid input, expected); bug = anything else. */
 export type RunOutcome = 'ok' | 'inputError' | 'bug' | 'editFailed';
