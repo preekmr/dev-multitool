@@ -7,7 +7,7 @@
     "color": "#3B3F9E",
     "theme": "dark"
   },
-  "version": "0.2.0",
+  "version": "0.3.0",
   "publisher": "preekmr",
   "license": "MIT",
   "repository": {
@@ -284,6 +284,33 @@
         "command": "multitool.generate.uuid",
         "title": "Generate UUID v4",
         "category": "Multitool"
+      },
+      {
+        "command": "multitool.jsonCompare.compareWith",
+        "title": "JSON Compare with…",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.jsonCompare.compareSelected",
+        "title": "JSON Compare Selected Files",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.jsonDiff.copyMarkdown",
+        "title": "Copy JSON Diff as Markdown",
+        "category": "Multitool",
+        "icon": "$(copy)"
+      },
+      {
+        "command": "multitool.jsonDiff.clear",
+        "title": "Clear JSON Diff",
+        "category": "Multitool",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "multitool.jsonDiff.reveal",
+        "title": "Show Change in Diff",
+        "category": "Multitool"
       }
     ],
     "submenus": [
@@ -533,6 +560,52 @@
         {
           "command": "multitool.generate.uuid",
           "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.jsonCompare.compareWith",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.jsonCompare.compareSelected",
+          "when": "false"
+        },
+        {
+          "command": "multitool.jsonDiff.reveal",
+          "when": "false"
+        },
+        {
+          "command": "multitool.jsonDiff.copyMarkdown",
+          "when": "multitool.jsonDiff.hasResult"
+        },
+        {
+          "command": "multitool.jsonDiff.clear",
+          "when": "multitool.jsonDiff.hasResult"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "multitool.jsonCompare.compareSelected",
+          "group": "3_compare@99",
+          "when": "listDoubleSelection && !explorerResourceIsFolder && resourceExtname =~ /^\\.(json|jsonc|json5|geojson|har|webmanifest)$/i"
+        }
+      ],
+      "editor/title/context": [
+        {
+          "command": "multitool.jsonCompare.compareWith",
+          "group": "3_compare@99",
+          "when": "resourceLangId == json || resourceLangId == jsonc || resourceExtname =~ /^\\.(json|jsonc|json5|geojson|har|webmanifest)$/i"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "multitool.jsonDiff.copyMarkdown",
+          "group": "navigation@1",
+          "when": "view == multitool.jsonDiff && multitool.jsonDiff.hasResult"
+        },
+        {
+          "command": "multitool.jsonDiff.clear",
+          "group": "navigation@2",
+          "when": "view == multitool.jsonDiff && multitool.jsonDiff.hasResult"
         }
       ],
       "editor/context": [
@@ -632,6 +705,10 @@
         {
           "command": "multitool.json.toYaml",
           "group": "1_tools@7"
+        },
+        {
+          "command": "multitool.jsonCompare.compareWith",
+          "group": "2_compare@1"
         }
       ],
       "multitool.context.xml": [
@@ -842,9 +919,37 @@
           "type": "boolean",
           "default": true,
           "description": "Show the Multitool submenu in the editor right-click menu."
+        },
+        "multitool.jsonCompare.sortKeys": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "JSON Compare: sort object keys on both sides, so key order never shows as a difference. Turn off to see key-order changes in the side-by-side diff."
         }
       }
-    }
+    },
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "multitool-json-diff",
+          "title": "JSON Diff",
+          "icon": "images/json-diff.svg"
+        }
+      ]
+    },
+    "views": {
+      "multitool-json-diff": [
+        {
+          "id": "multitool.jsonDiff",
+          "name": "JSON Diff"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "multitool.jsonDiff",
+        "contents": "Compare two JSON files or tabs side by side, ignoring key order and formatting. The changes are listed here.\n[Compare with…](command:multitool.jsonCompare.compareWith)\nYou can also select two JSON files in the Explorer, right-click, and choose \"Multitool: JSON Compare Selected Files\"."
+      }
+    ]
   },
   "scripts": {
     "build": "node esbuild.mjs",
@@ -854,11 +959,13 @@
     "sync": "tsx scripts/sync-manifest.ts",
     "check:manifest": "tsx scripts/sync-manifest.ts --check",
     "new-tool": "tsx scripts/new-tool.ts",
-    "vscode:prepublish": "npm run check:manifest && node esbuild.mjs --production",
-    "package": "vsce package"
+    "vscode:prepublish": "npm run check:manifest && node esbuild.mjs --production && npm run check:bundle",
+    "package": "vsce package",
+    "check:bundle": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "fast-xml-parser": "^5.12.0",
+    "jsonc-parser": "^3.3.1",
     "xml-formatter": "^3.7.0",
     "yaml": "^2.9.1"
   },

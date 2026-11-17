@@ -3,6 +3,15 @@
  * Shared by scripts/sync-manifest.ts and the tests.
  */
 import { commandId, displayTitle, type Tool } from '../src/core/tool';
+import {
+  COMPARE,
+  COMPARE_COMMANDS,
+  COMPARE_VIEW,
+  COMPARE_VIEW_CONTAINER,
+  HAS_RESULT_CONTEXT,
+} from '../src/compare/commands';
+
+const JSON_FILE_WHEN = 'resourceExtname =~ /^\\.(json|jsonc|json5|geojson|har|webmanifest)$/i';
 
 export const META_COMMANDS = [
   { command: 'multitool.runTool', title: 'Run Tool…', category: 'Multitool' },
@@ -18,6 +27,7 @@ export function buildContributes(tools: readonly Tool[]) {
   const commands = [
     ...META_COMMANDS,
     ...tools.map((t) => ({ command: commandId(t), title: displayTitle(t), category: 'Multitool' })),
+    ...COMPARE_COMMANDS.map(({ command, title, category, icon }) => ({ command, title, category, ...(icon ? { icon } : {}) })),
   ];
 
   const submenus = [
@@ -26,7 +36,26 @@ export function buildContributes(tools: readonly Tool[]) {
   ];
 
   const menus: Record<string, unknown[]> = {
-    commandPalette: tools.map((t) => ({ command: commandId(t), when: 'editorIsOpen' })),
+    commandPalette: [
+      ...tools.map((t) => ({ command: commandId(t), when: 'editorIsOpen' })),
+      { command: COMPARE.compareWith, when: 'editorIsOpen' },
+      { command: COMPARE.compareSelected, when: 'false' },
+      { command: COMPARE.reveal, when: 'false' },
+      { command: COMPARE.copyMarkdown, when: HAS_RESULT_CONTEXT },
+      { command: COMPARE.clear, when: HAS_RESULT_CONTEXT },
+    ],
+    // Explorer: select two JSON files → right-click.
+    'explorer/context': [
+      { command: COMPARE.compareSelected, group: '3_compare@99', when: `listDoubleSelection && !explorerResourceIsFolder && ${JSON_FILE_WHEN}` },
+    ],
+    // Right-click on an editor tab.
+    'editor/title/context': [
+      { command: COMPARE.compareWith, group: '3_compare@99', when: `resourceLangId == json || resourceLangId == jsonc || ${JSON_FILE_WHEN}` },
+    ],
+    'view/title': [
+      { command: COMPARE.copyMarkdown, group: 'navigation@1', when: `view == ${COMPARE_VIEW} && ${HAS_RESULT_CONTEXT}` },
+      { command: COMPARE.clear, group: 'navigation@2', when: `view == ${COMPARE_VIEW} && ${HAS_RESULT_CONTEXT}` },
+    ],
     'editor/context': [
       { submenu: 'multitool.context', group: '1_modification@99', when: 'config.multitool.contextMenu.enabled' },
     ],
@@ -41,6 +70,20 @@ export function buildContributes(tools: readonly Tool[]) {
       .filter((t) => t.category === c)
       .map((t, i) => ({ command: commandId(t), group: `1_tools@${i + 1}` }));
   }
+  // JSON Compare sits in the JSON submenu of the editor right-click menu, after the text tools.
+  menus['multitool.context.json']?.push({ command: COMPARE.compareWith, group: '2_compare@1' });
+
+  // The "JSON Diff" report lives in the bottom panel, next to Terminal / Problems.
+  const viewsContainers = {
+    panel: [{ id: COMPARE_VIEW_CONTAINER, title: 'JSON Diff', icon: 'images/json-diff.svg' }],
+  };
+  const views = { [COMPARE_VIEW_CONTAINER]: [{ id: COMPARE_VIEW, name: 'JSON Diff' }] };
+  const viewsWelcome = [
+    {
+      view: COMPARE_VIEW,
+      contents: `Compare two JSON files or tabs side by side, ignoring key order and formatting. The changes are listed here.\n[Compare with…](command:${COMPARE.compareWith})\nYou can also select two JSON files in the Explorer, right-click, and choose "Multitool: JSON Compare Selected Files".`,
+    },
+  ];
 
   const keybindings = [
     { command: 'multitool.runTool', key: 'ctrl+alt+shift+d', mac: 'cmd+alt+shift+d', when: 'editorTextFocus' },
@@ -68,10 +111,16 @@ export function buildContributes(tools: readonly Tool[]) {
         default: true,
         description: 'Show the Multitool submenu in the editor right-click menu.',
       },
+      'multitool.jsonCompare.sortKeys': {
+        type: 'boolean',
+        default: true,
+        markdownDescription:
+          'JSON Compare: sort object keys on both sides, so key order never shows as a difference. Turn off to see key-order changes in the side-by-side diff.',
+      },
     },
   };
 
-  return { commands, submenus, menus, keybindings, configuration };
+  return { commands, submenus, menus, keybindings, configuration, viewsContainers, views, viewsWelcome };
 }
 
 export function buildToolTable(tools: readonly Tool[]): string {

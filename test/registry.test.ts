@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { tools } from '../src/tools';
 import { validateTools } from '../src/core/validate';
 import { buildContributes } from '../scripts/manifest';
+import { COMPARE_COMMANDS } from '../src/compare/commands';
 
 describe('registry', () => {
   it('has valid, unique tool ids', () => {
@@ -37,5 +38,19 @@ describe('registry', () => {
       .join('\n');
     const untested = tools.filter((t) => !testSources.includes(`'${t.id}'`)).map((t) => t.id);
     expect(untested, 'Add a test that calls run(<id>, ...) for each of these tools').toEqual([]);
+  });
+
+  it('JSON Compare commands are contributed and reachable from menus', () => {
+    const { commands, menus } = buildContributes(tools);
+    const ids = new Set(commands.map((c) => c.command));
+    for (const c of COMPARE_COMMANDS) expect(ids.has(c.command)).toBe(true);
+    const where = (cmd: string) =>
+      Object.entries(menus)
+        .filter(([, items]) => items.some((m) => (m as { command?: string }).command === cmd))
+        .map(([menu]) => menu);
+    expect(where('multitool.jsonCompare.compareWith')).toEqual(
+      expect.arrayContaining(['commandPalette', 'editor/title/context', 'multitool.context.json']),
+    );
+    expect(where('multitool.jsonCompare.compareSelected')).toEqual(expect.arrayContaining(['explorer/context']));
   });
 });

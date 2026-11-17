@@ -2,6 +2,15 @@
 
 All notable changes to Dev Multitool are listed here.
 
+## 0.3.0 — 2026-11-17
+
+- **JSON Compare:** compare two JSON files or open tabs side by side, ignoring key order and formatting.
+  Start it with **Multitool: JSON Compare with…** (Command Palette, editor tab or editor right-click menu) or by
+  selecting two JSON files in the Explorer. A **JSON Diff** panel lists every change by path (with type changes),
+  jumps to it in the diff on click, and copies the list as a Markdown table. Works with JSON with comments.
+- New setting `multitool.jsonCompare.sortKeys`.
+- **Multitool: Run Tool…** also lists JSON Compare.
+
 ## 0.2.0 — 2026-11-11
 
 - Anonymous usage and error telemetry (PostHog). Follows VS Code's `telemetry.telemetryLevel` setting;
