@@ -1,0 +1,8 @@
+# Keep LF line endings in the repo and in every checkout (Windows included).
+# The manifest check (npm run check:manifest) compares package.json and README.md byte for byte,
+# so CRLF conversion on checkout would make it fail.
+* text=auto eol=lf
+
+# Binary files
+*.png binary
+*.vsix binary
