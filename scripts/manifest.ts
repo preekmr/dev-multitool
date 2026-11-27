@@ -1,5 +1,5 @@
 /**
- * Builds the `contributes` section of package.json from the tool registry.
+ * Builds the `contributes` section of package.json from the tool and feature registries.
  * Shared by scripts/sync-manifest.ts and the tests.
  */
 import { commandId, displayTitle, type Tool } from '../src/core/tool';
@@ -10,6 +10,8 @@ import {
   COMPARE_VIEW_CONTAINER,
   HAS_RESULT_CONTEXT,
 } from '../src/compare/commands';
+import { features as allFeatures } from '../src/features';
+import { featureTitle, type Feature } from '../src/features/feature';
 
 const JSON_FILE_WHEN = 'resourceExtname =~ /^\\.(json|jsonc|json5|geojson|har|webmanifest)$/i';
 
@@ -21,13 +23,18 @@ export const META_COMMANDS = [
 
 const slug = (category: string) => category.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-export function buildContributes(tools: readonly Tool[]) {
-  const categories = [...new Set(tools.map((t) => t.category))];
+export function buildContributes(tools: readonly Tool[], features: readonly Feature[] = allFeatures) {
+  const featureCommands = features.flatMap((f) => f.commands.map((c) => ({ feature: f, ...c })));
+  // Tool categories first; a feature category with right-click entries gets a submenu too.
+  const categories = [
+    ...new Set([...tools.map((t) => t.category), ...featureCommands.filter((c) => c.contextMenu).map((c) => c.feature.category)]),
+  ];
 
   const commands = [
     ...META_COMMANDS,
     ...tools.map((t) => ({ command: commandId(t), title: displayTitle(t), category: 'Multitool' })),
     ...COMPARE_COMMANDS.map(({ command, title, category, icon }) => ({ command, title, category, ...(icon ? { icon } : {}) })),
+    ...featureCommands.map((c) => ({ command: c.command, title: featureTitle(c.feature, c), category: 'Multitool' })),
   ];
 
   const submenus = [
@@ -43,6 +50,7 @@ export function buildContributes(tools: readonly Tool[]) {
       { command: COMPARE.reveal, when: 'false' },
       { command: COMPARE.copyMarkdown, when: HAS_RESULT_CONTEXT },
       { command: COMPARE.clear, when: HAS_RESULT_CONTEXT },
+      ...featureCommands.map((c) => ({ command: c.command, when: c.when ?? 'editorIsOpen' })),
     ],
     // Explorer: select two JSON files → right-click.
     'explorer/context': [
@@ -72,6 +80,12 @@ export function buildContributes(tools: readonly Tool[]) {
   }
   // JSON Compare sits in the JSON submenu of the editor right-click menu, after the text tools.
   menus['multitool.context.json']?.push({ command: COMPARE.compareWith, group: '2_compare@1' });
+  // Feature commands come after the category's tools, one menu group per feature.
+  for (const f of features) {
+    f.commands
+      .filter((c) => c.contextMenu)
+      .forEach((c, i) => menus[`multitool.context.${slug(f.category)}`].push({ command: c.command, group: `3_${f.id}@${i + 1}` }));
+  }
 
   // The "JSON Diff" report lives in the bottom panel, next to Terminal / Problems.
   const viewsContainers = {
@@ -95,6 +109,14 @@ export function buildContributes(tools: readonly Tool[]) {
         mac: t.keybinding!.mac ?? t.keybinding!.key,
         when: 'editorTextFocus',
       })),
+    ...featureCommands
+      .filter((c) => c.keybinding)
+      .map((c) => ({
+        command: c.command,
+        key: c.keybinding!.key,
+        mac: c.keybinding!.mac ?? c.keybinding!.key,
+        when: c.keybinding!.when ?? 'editorTextFocus',
+      })),
   ];
 
   const configuration = {
@@ -117,6 +139,7 @@ export function buildContributes(tools: readonly Tool[]) {
         markdownDescription:
           'JSON Compare: sort object keys on both sides, so key order never shows as a difference. Turn off to see key-order changes in the side-by-side diff.',
       },
+      ...Object.assign({}, ...features.map((f) => f.settings ?? {})),
     },
   };
 

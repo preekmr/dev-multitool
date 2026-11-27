@@ -6,12 +6,15 @@ import { pickTool } from './core/picker';
 import { initTelemetry } from './telemetry';
 import { registerJsonCompare } from './compare';
 import { COMPARE } from './compare/commands';
+import { features } from './features';
+import { registerJsonPath } from './features/json';
 
 const LAST_TOOL_KEY = 'multitool.lastToolId';
 
 export function activate(context: vscode.ExtensionContext): void {
   initTelemetry(context);
   registerJsonCompare(context);
+  registerJsonPath(context);
   const byId = new Map(tools.map((t) => [t.id, t]));
 
   const remember = (tool: Tool) => context.workspaceState.update(LAST_TOOL_KEY, tool.id);
@@ -35,6 +38,11 @@ export function activate(context: vscode.ExtensionContext): void {
           description: 'Compare with another tab or file, ignoring key order and formatting',
           command: COMPARE.compareWith,
         },
+        ...features.flatMap((f) =>
+          f.commands
+            .filter((c) => c.picker)
+            .map((c) => ({ category: f.category, title: c.title, description: c.description, command: c.command })),
+        ),
       ]);
       if (!picked) return;
       if ('command' in picked) {

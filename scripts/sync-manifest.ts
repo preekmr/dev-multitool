@@ -1,5 +1,5 @@
 /**
- * Regenerates package.json `contributes` and the tool table in README.md from src/tools.
+ * Regenerates package.json `contributes` and the tool table in README.md from src/tools and src/features.
  *   npm run sync            write changes
  *   npm run check:manifest  fail (exit 1) if files are out of date — used in CI
  */
@@ -7,14 +7,21 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { tools } from '../src/tools';
 import { validateTools } from '../src/core/validate';
-import { buildContributes, buildToolTable } from './manifest';
+import { commandId } from '../src/core/tool';
+import { features } from '../src/features';
+import { validateFeatures } from '../src/features/feature';
+import { COMPARE_COMMANDS } from '../src/compare/commands';
+import { buildContributes, buildToolTable, META_COMMANDS } from './manifest';
 
 const root = resolve(__dirname, '..');
 const check = process.argv.includes('--check');
 
-const problems = validateTools(tools);
+const problems = [
+  ...validateTools(tools),
+  ...validateFeatures(features, [...META_COMMANDS, ...COMPARE_COMMANDS].map((c) => c.command).concat(tools.map(commandId))),
+];
 if (problems.length > 0) {
-  console.error('Tool registry problems:\n  ' + problems.join('\n  '));
+  console.error('Registry problems:\n  ' + problems.join('\n  '));
   process.exit(1);
 }
 
@@ -53,4 +60,5 @@ if (stale.length > 0) {
   console.error(`Out of date: ${stale.join(', ')}. Run "npm run sync" and commit the result.`);
   process.exit(1);
 }
-console.log(`${tools.length} tools ${check ? 'in sync' : 'synced'}.`);
+const commandCount = features.reduce((n, f) => n + f.commands.length, 0);
+console.log(`${tools.length} tools and ${commandCount} feature commands ${check ? 'in sync' : 'synced'}.`);

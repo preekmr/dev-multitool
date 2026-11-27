@@ -22,10 +22,15 @@ src/
     runner.ts     # VS Code glue: selections, whole document, multi-cursor, output
     picker.ts     # the "Multitool: Run Tool…" quick pick
     util.ts       # shared helpers (JSON parsing with line/column, line handling, UTF-8)
+    json/         # JSON paths and array lookups by offset (pure, tested): used by src/features/json
     telemetry-format.ts  # telemetry event shapes and privacy scrubbing (pure, tested)
   tools/
     index.ts      # the registry — every tool is listed here
     json.ts, base64.ts, jwt.ts, …   # one file per category
+  features/
+    index.ts      # the feature registry: editor commands that aren't tools (need the cursor or editor UI)
+    feature.ts    # the Feature contract; `npm run sync` writes each feature's commands, menus and settings
+    json/         # JSON Copy Path at Cursor, Go to Path…, Count Array Items
   extension.ts    # registers one command per tool + the picker commands
   telemetry.ts    # anonymous PostHog telemetry via vscode.TelemetryLogger (off unless POSTHOG_KEY is set at build)
 scripts/

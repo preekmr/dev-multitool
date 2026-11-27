@@ -311,6 +311,21 @@
         "command": "multitool.jsonDiff.reveal",
         "title": "Show Change in Diff",
         "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.copyPath",
+        "title": "JSON Copy Path at Cursor",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.goToPath",
+        "title": "JSON Go to Path…",
+        "category": "Multitool"
+      },
+      {
+        "command": "multitool.json.countArrayItems",
+        "title": "JSON Count Array Items",
+        "category": "Multitool"
       }
     ],
     "submenus": [
@@ -580,6 +595,18 @@
         {
           "command": "multitool.jsonDiff.clear",
           "when": "multitool.jsonDiff.hasResult"
+        },
+        {
+          "command": "multitool.json.copyPath",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.goToPath",
+          "when": "editorIsOpen"
+        },
+        {
+          "command": "multitool.json.countArrayItems",
+          "when": "editorIsOpen"
         }
       ],
       "explorer/context": [
@@ -709,6 +736,18 @@
         {
           "command": "multitool.jsonCompare.compareWith",
           "group": "2_compare@1"
+        },
+        {
+          "command": "multitool.json.copyPath",
+          "group": "3_jsonPath@1"
+        },
+        {
+          "command": "multitool.json.goToPath",
+          "group": "3_jsonPath@2"
+        },
+        {
+          "command": "multitool.json.countArrayItems",
+          "group": "3_jsonPath@3"
         }
       ],
       "multitool.context.xml": [
@@ -924,6 +963,21 @@
           "type": "boolean",
           "default": true,
           "markdownDescription": "JSON Compare: sort object keys on both sides, so key order never shows as a difference. Turn off to see key-order changes in the side-by-side diff."
+        },
+        "multitool.json.pathStyle": {
+          "type": "string",
+          "enum": [
+            "jsonpath",
+            "pointer",
+            "js"
+          ],
+          "default": "jsonpath",
+          "markdownEnumDescriptions": [
+            "JSONPath: `$.users[3].name`, keys that are not identifiers in quotes: `$['a-b']`",
+            "JSON Pointer (RFC 6901): `/users/3/name`",
+            "JavaScript: `users[3].name`"
+          ],
+          "markdownDescription": "How **JSON Copy Path at Cursor** and **JSON Go to Path…** write paths. **Go to Path…** reads all three styles."
         }
       }
     },

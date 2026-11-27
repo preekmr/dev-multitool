@@ -68,6 +68,25 @@ Good to know:
   JavaScript.
 - Set `multitool.jsonCompare.sortKeys` to `false` to see key-order changes in the side-by-side diff.
 
+## JSON Path and array counts
+
+Three commands for finding your way around a JSON file. They work in JSON and JSON with comments, in a
+half-written file, and in any other tab whose text is valid JSON. Find them in the Command Palette, the editor's
+right-click menu → Multitool → JSON, or `Multitool: Run Tool…`.
+
+- **Multitool: JSON Copy Path at Cursor** copies the path of the value under the cursor, e.g. `$.users[3].name`.
+  On a key you get the path of its value; between items you get the path of the object or array around them.
+  With several cursors you get one path per line.
+- **Multitool: JSON Go to Path…** asks for a path (filled in with the one at the cursor), then selects that value
+  and scrolls it into view. It reads all three styles: `$.users[3].name`, `users[3].name` and `/users/3/name`.
+  If nothing is there it tells you where the path stops matching, e.g. `$.users is an array with 2 items`.
+- **Multitool: JSON Count Array Items** shows how many items the array at the cursor holds (the closest one
+  around the cursor, or the array of the key you're on), with a **Copy** button.
+
+Set `multitool.json.pathStyle` to `pointer` (`/users/3/name`) or `js` (`users[3].name`) to copy paths in another
+style. Keys that aren't plain identifiers are quoted: `$['a-b']`. With duplicate keys, Go to Path picks the last
+one, as `JSON.parse` does. Queries such as `$..price` or `[*]` are not supported yet.
+
 ## Keybindings
 
 Open **Preferences: Open Keyboard Shortcuts (JSON)** and add entries using the command IDs from the table below:
@@ -89,6 +108,7 @@ Or open **Preferences: Open Keyboard Shortcuts**, search for `Multitool` and cli
 | `multitool.indent` | `"auto"` | Indentation for formatters: `"auto"` follows the editor, `"tab"`, or a number of spaces. |
 | `multitool.contextMenu.enabled` | `true` | Show the Multitool submenu in the editor right-click menu. |
 | `multitool.jsonCompare.sortKeys` | `true` | JSON Compare: sort keys on both sides so key order never shows as a difference. |
+| `multitool.json.pathStyle` | `"jsonpath"` | How JSON Copy Path at Cursor writes paths: `"jsonpath"` (`$.a[0]`), `"pointer"` (`/a/0`) or `"js"` (`a[0]`). |
 
 ## All tools
 
